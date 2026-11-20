@@ -2,6 +2,12 @@
   "name": "@chhapai/desktop",
   "version": "1.0.0",
   "private": true,
+  "description": "Walk-in self-service printing counter app for Chhapai",
+  "author": "Abdulhayy Khan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abdulhayykhan/Chhapai.git"
+  },
   "main": "dist/main/index.js",
   "scripts": {
     "build:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --external:pdf-to-printer --outfile=dist/main/index.js",
@@ -11,7 +17,7 @@
     "dev:renderer": "vite",
     "dev:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --external:pdf-to-printer --outfile=dist/main/index.js && esbuild src/preload/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/preload/index.js",
     "start": "electron .",
-    "package": "pnpm run build && electron-builder --win",
+    "package": "pnpm run build && electron-builder --win --publish never",
     "test": "vitest run"
   },
   "build": {
