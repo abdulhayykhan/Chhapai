@@ -21,6 +21,13 @@ export interface ElectronAPI {
   getStore: (key: string) => Promise<any>;
   setStore: (key: string, value: any) => Promise<void>;
   deleteStore: (key: string) => Promise<void>;
+  getServerStatus: () => Promise<{
+    isRunning: boolean;
+    isEmbedded: boolean;
+    port: number;
+    tunnelUrl: string | null;
+    error?: string;
+  }>;
 }
 
 const electronAPI: ElectronAPI = {
@@ -34,6 +41,7 @@ const electronAPI: ElectronAPI = {
   setStore: (key: string, value: any) =>
     ipcRenderer.invoke("store:set", key, value),
   deleteStore: (key: string) => ipcRenderer.invoke("store:delete", key),
+  getServerStatus: () => ipcRenderer.invoke("server:status"),
 };
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);

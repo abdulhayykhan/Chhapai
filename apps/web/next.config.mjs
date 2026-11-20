@@ -2,7 +2,8 @@
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  poweredByHeader: false
+  poweredByHeader: false,
+  transpilePackages: ['@chhapai/shared']
 };
 
 export default nextConfig;

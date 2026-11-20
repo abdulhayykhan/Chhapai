@@ -15,6 +15,11 @@ interface Props {
   shop: Shop | null;
   isConnected: boolean;
   soundEnabled: boolean;
+  serverStatus?: {
+    isRunning: boolean;
+    isEmbedded: boolean;
+    tunnelUrl: string | null;
+  } | null;
   onToggleSound: () => void;
   onOpenSettings: () => void;
   onOpenReport: () => void;
@@ -26,6 +31,7 @@ export const Header: React.FC<Props> = ({
   shop,
   isConnected,
   soundEnabled,
+  serverStatus,
   onToggleSound,
   onOpenSettings,
   onOpenReport,
@@ -70,6 +76,16 @@ export const Header: React.FC<Props> = ({
             />
             {isConnected ? "Online" : "Offline"}
           </span>
+
+          {serverStatus?.isEmbedded && (
+            <span
+              title="Shop PC par built-in API server chal raha hai"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200"
+            >
+              <Radio className="w-3.5 h-3.5" />
+              Auto-Server: 3001
+            </span>
+          )}
 
           <span
             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${

@@ -14,6 +14,7 @@ import {
   print as printPdfToPrinter,
   getPrinters as getSystemPrinters,
 } from "pdf-to-printer";
+import { serverManager } from "./serverManager";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -33,7 +34,10 @@ if (!gotTheLock) {
     }
   });
 
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
+    // Start embedded API and tunnel if not already running
+    await serverManager.start();
+
     createWindow();
     createTray();
     setupIpcHandlers();
@@ -318,8 +322,14 @@ function setupIpcHandlers() {
     delete store[key];
     writeStoredData(store);
   });
+
+  // 9. server:status
+  ipcMain.handle("server:status", () => {
+    return serverManager.getStatus();
+  });
 }
 
 app.on("before-quit", () => {
   isQuitting = true;
+  serverManager.stop();
 });

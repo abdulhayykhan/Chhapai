@@ -21,6 +21,11 @@ export const App: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isConnected, setIsConnected] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [serverStatus, setServerStatus] = useState<{
+    isRunning: boolean;
+    isEmbedded: boolean;
+    tunnelUrl: string | null;
+  } | null>(null);
 
   // Queue state
   const [jobs, setJobs] = useState<PrintJobDto[]>([]);
@@ -35,6 +40,10 @@ export const App: React.FC = () => {
 
   // 1. Initial auth check
   useEffect(() => {
+    if (window.electronAPI?.getServerStatus) {
+      window.electronAPI.getServerStatus().then(setServerStatus);
+    }
+
     storage.get<boolean>("sound_enabled").then((val) => {
       if (val !== null) setSoundEnabled(val);
     });
@@ -321,6 +330,7 @@ export const App: React.FC = () => {
         shop={shop}
         isConnected={isConnected}
         soundEnabled={soundEnabled}
+        serverStatus={serverStatus}
         onToggleSound={handleToggleSound}
         onOpenSettings={() => setShowSettings(true)}
         onOpenReport={() => setShowReport(true)}
