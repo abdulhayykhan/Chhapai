@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@12.21.0",
   "scripts": {
-    "build": "pnpm --filter @chhapai/shared build",
+    "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
