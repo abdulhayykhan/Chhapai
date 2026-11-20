@@ -9,6 +9,9 @@ import { TokenModule } from "./token/token.module.js";
 import { AuthModule } from "./auth/auth.module.js";
 import { PublicModule } from "./public/public.module.js";
 import { HealthModule } from "./health/health.module.js";
+import { RealtimeModule } from "./realtime/realtime.module.js";
+import { AdminModule } from "./admin/admin.module.js";
+import { CronModule } from "./cron/cron.module.js";
 
 @Module({
   imports: [
@@ -30,6 +33,9 @@ import { HealthModule } from "./health/health.module.js";
     AuthModule,
     PublicModule,
     HealthModule,
+    RealtimeModule,
+    AdminModule,
+    CronModule,
   ],
 })
 export class AppModule {}

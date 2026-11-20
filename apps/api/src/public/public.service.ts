@@ -3,6 +3,7 @@ import { PrismaService } from "../prisma/prisma.service.js";
 import { StorageService } from "../storage/storage.service.js";
 import { ConversionService } from "../conversion/conversion.service.js";
 import { TokenService } from "../token/token.service.js";
+import { AdminGateway } from "../realtime/admin.gateway.js";
 import {
   calcQuote,
   ErrorCode,
@@ -28,6 +29,7 @@ export class PublicService {
     private readonly storage: StorageService,
     private readonly conversion: ConversionService,
     private readonly tokenService: TokenService,
+    private readonly adminGateway?: AdminGateway,
   ) {}
 
   async getShopBySlug(slug: string) {
@@ -294,6 +296,9 @@ export class PublicService {
 
           return newJob;
         });
+
+        // Notify counter staff live
+        this.adminGateway?.emitJobCreated(upload.shopId, job);
 
         return {
           publicToken: job.publicToken,
