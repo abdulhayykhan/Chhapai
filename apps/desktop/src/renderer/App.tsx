@@ -359,6 +359,35 @@ export const App: React.FC = () => {
         />
       </main>
 
+      {/* Bottom Status Bar */}
+      <footer className="h-6 bg-slate-200/80 border-t border-slate-300 px-4 flex items-center justify-between text-[11px] text-slate-600 select-none">
+        <div className="flex items-center gap-2">
+          <span>Chhapai v1.0.0 (Free &amp; Open Source)</span>
+          <span>•</span>
+          <span>
+            Created by{" "}
+            <a
+              href="https://abdulhayykhan.dev"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-800 hover:text-blue-700 font-semibold underline"
+            >
+              Abdul Hayy Khan
+            </a>
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <a
+            href="https://abdulhayykhan.dev"
+            target="_blank"
+            rel="noreferrer"
+            className="text-slate-500 hover:text-slate-800 hover:underline"
+          >
+            abdulhayykhan.dev
+          </a>
+        </div>
+      </footer>
+
       {/* Modals */}
       {rejectingJob && (
         <RejectModal

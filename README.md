@@ -1,10 +1,12 @@
 # Chhapai (چھپائی)
 
-> **Walk-in QR-based self-service printing system for print shops in Pakistan.**
+> **Walk-in QR-based self-service printing system for print shops in Pakistan.**  
+> Created and maintained by [Abdul Hayy Khan](https://abdulhayykhan.dev).
 
 **Live Customer Web App:** [https://chhapai-web.vercel.app](https://chhapai-web.vercel.app)  
 **Cloud Managed Database:** Supabase PostgreSQL (`ap-south-1` Mumbai)  
-**Desktop App Mode:** Zero-Click Auto-Starting Server (Double-click app icon to start API + Counter App)
+**Desktop App Mode:** Zero-Click Auto-Starting Server (Double-click app icon to start API + Counter App)  
+**Author Portfolio:** [abdulhayykhan.dev](https://abdulhayykhan.dev)
 
 Chhapai eliminates the traditional, messy walk-in printing workflow in Pakistan (emailing files, passing USB drives, or WhatsApping documents to a crowded shop counter). 
 
@@ -189,5 +191,14 @@ See [`docs/DECISIONS.md`](docs/DECISIONS.md) for detailed design rationales:
 
 ---
 
+## 👨‍💻 Author & Credits
+
+Chhapai was designed and developed by **Abdul Hayy Khan**.
+- Portfolio: [https://abdulhayykhan.dev](https://abdulhayykhan.dev)
+- GitHub: [@abdulhayykhan](https://github.com/abdulhayykhan)
+
+---
+
 ## 📄 License
-Private & Proprietary — Developed for Chhapai Print Services.
+
+Open-source project created by Abdul Hayy Khan (https://abdulhayykhan.dev).

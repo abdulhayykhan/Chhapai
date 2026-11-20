@@ -47,12 +47,23 @@ export const Header: React.FC<Props> = ({
             چھ
           </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-900 leading-tight">
-              Chhapai{" "}
-              <span className="text-xs font-normal text-slate-500 font-mono">
-                v1.0
-              </span>
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold text-slate-900 leading-tight">
+                Chhapai{" "}
+                <span className="text-xs font-normal text-slate-500 font-mono">
+                  v1.0
+                </span>
+              </h1>
+              <a
+                href="https://abdulhayykhan.dev"
+                target="_blank"
+                rel="noreferrer"
+                title="Developed by Abdul Hayy Khan"
+                className="text-[11px] font-medium text-slate-400 hover:text-blue-600 underline underline-offset-2 transition-colors cursor-pointer"
+              >
+                by Abdul Hayy Khan
+              </a>
+            </div>
             <p className="text-xs text-slate-500 font-medium">
               {shop?.name || "Counter App"}{" "}
               {shop?.isOpen ? "• Khula Hai" : "• Band Hai"}

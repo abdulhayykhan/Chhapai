@@ -28,6 +28,7 @@ export interface ElectronAPI {
     tunnelUrl: string | null;
     error?: string;
   }>;
+  openExternal: (url: string) => Promise<void>;
 }
 
 const electronAPI: ElectronAPI = {
@@ -42,6 +43,7 @@ const electronAPI: ElectronAPI = {
     ipcRenderer.invoke("store:set", key, value),
   deleteStore: (key: string) => ipcRenderer.invoke("store:delete", key),
   getServerStatus: () => ipcRenderer.invoke("server:status"),
+  openExternal: (url: string) => ipcRenderer.invoke("app:openExternal", url),
 };
 
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);

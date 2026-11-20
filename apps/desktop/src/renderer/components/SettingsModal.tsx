@@ -427,6 +427,32 @@ export const SettingsModal: React.FC<Props> = ({ shop, onClose, onSave }) => {
             </div>
           </div>
 
+          {/* About & Author Credits */}
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+            <div>
+              <p className="font-semibold text-slate-700">Chhapai v1.0.0 (Free &amp; Open Source)</p>
+              <p className="mt-0.5">
+                Authored by{" "}
+                <a
+                  href="https://abdulhayykhan.dev"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 hover:text-blue-700 underline font-medium"
+                >
+                  Abdul Hayy Khan
+                </a>
+              </p>
+            </div>
+            <a
+              href="https://abdulhayykhan.dev"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
+            >
+              abdulhayykhan.dev
+            </a>
+          </div>
+
           {/* Footer Save Button */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-200">
             {saveSuccess ? (

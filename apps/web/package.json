@@ -2,6 +2,8 @@
   "name": "@chhapai/web",
   "version": "1.0.0",
   "private": true,
+  "author": "Abdul Hayy Khan (https://abdulhayykhan.dev)",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

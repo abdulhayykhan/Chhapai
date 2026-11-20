@@ -6,6 +6,7 @@ import {
   Menu,
   nativeImage,
   safeStorage,
+  shell,
 } from "electron";
 import path from "path";
 import fs from "fs";
@@ -75,6 +76,14 @@ function createWindow() {
     const indexPath = path.join(__dirname, "../renderer/index.html");
     mainWindow.loadFile(indexPath);
   }
+
+  // Handle external links safely
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith("http:") || url.startsWith("https:")) {
+      shell.openExternal(url);
+    }
+    return { action: "deny" };
+  });
 
   // Minimize to tray on close
   mainWindow.on("close", (event) => {
@@ -326,6 +335,13 @@ function setupIpcHandlers() {
   // 9. server:status
   ipcMain.handle("server:status", () => {
     return serverManager.getStatus();
+  });
+
+  // 10. app:openExternal
+  ipcMain.handle("app:openExternal", (_event, url: string) => {
+    if (typeof url === "string" && (url.startsWith("http:") || url.startsWith("https:"))) {
+      return shell.openExternal(url);
+    }
   });
 }
 

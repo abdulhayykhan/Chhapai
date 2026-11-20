@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Walk-in self-service printing counter app for Chhapai",
-  "author": "Abdulhayy Khan",
+  "author": "Abdul Hayy Khan (https://abdulhayykhan.dev)",
   "repository": {
     "type": "git",
     "url": "https://github.com/abdulhayykhan/Chhapai.git"

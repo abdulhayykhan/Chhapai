@@ -154,7 +154,15 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           </button>
 
           <p className="text-[11px] text-center text-slate-400 font-medium">
-            Makhsoos Chhapai POS Counter System • Outbound HTTPS Connection
+            Chhapai Free &amp; Open Source • Created by{" "}
+            <a
+              href="https://abdulhayykhan.dev"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-600 hover:text-blue-600 underline font-semibold transition-colors"
+            >
+              Abdul Hayy Khan
+            </a>
           </p>
         </form>
       </div>
