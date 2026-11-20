@@ -414,43 +414,62 @@ export default function ShopOrderPage() {
                   </span>
 
                   {/* Copies */}
-                  <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-sm text-slate-900">Copies</p>
-                      <p className="text-xs text-slate-500">
-                        Tadaad (1 se 100)
-                      </p>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-sm text-slate-900">Copies (Tadaad)</p>
+                        <p className="text-xs text-slate-500">Kitne set print karne hain?</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => setCopies((c) => Math.max(1, c - 1))}
+                          className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 flex items-center justify-center text-lg transition active:scale-95"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={copies}
+                          onChange={(e) =>
+                            setCopies(
+                              Math.min(
+                                100,
+                                Math.max(1, parseInt(e.target.value) || 1),
+                              ),
+                            )
+                          }
+                          className="w-12 h-10 text-center font-bold text-slate-900 border border-slate-200 rounded-xl focus:outline-blue-600"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setCopies((c) => Math.min(100, c + 1))}
+                          className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 flex items-center justify-center text-lg transition active:scale-95"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => setCopies((c) => Math.max(1, c - 1))}
-                        className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 flex items-center justify-center text-lg transition"
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        max="100"
-                        value={copies}
-                        onChange={(e) =>
-                          setCopies(
-                            Math.min(
-                              100,
-                              Math.max(1, parseInt(e.target.value) || 1),
-                            ),
-                          )
-                        }
-                        className="w-12 h-10 text-center font-bold text-slate-900 border border-slate-200 rounded-xl focus:outline-blue-600"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setCopies((c) => Math.min(100, c + 1))}
-                        className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 flex items-center justify-center text-lg transition"
-                      >
-                        +
-                      </button>
+
+                    {/* Quick Presets */}
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <span className="text-[11px] font-medium text-slate-400 mr-1">Quick:</span>
+                      {[1, 2, 3, 5, 10].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setCopies(preset)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                            copies === preset
+                              ? "bg-blue-700 text-white shadow-2xs"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          }`}
+                        >
+                          {preset}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
@@ -618,23 +637,43 @@ export default function ShopOrderPage() {
                       <span>{submitError}</span>
                     </div>
                   )}
+
+                  {/* Live Quote Breakdown Card */}
+                  {quote && (
+                    <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-200/80 rounded-2xl p-4 text-xs space-y-2">
+                      <div className="flex items-center justify-between font-bold text-slate-900">
+                        <span className="flex items-center gap-1.5 text-blue-900">
+                          <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                          Live Price Estimate (شفاف حساب):
+                        </span>
+                        <span className="text-blue-700 font-black text-sm">Rs. {quote.total}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1.5 border-t border-blue-200/50">
+                        <span>
+                          {quote.printedPages} {quote.printedPages === 1 ? "page" : "pages"} ({colorMode === ColorMode.BW ? "B&W" : "Color"}, {sides === Sides.SINGLE ? "Single" : "Double Sided"})
+                        </span>
+                        <span className="font-semibold text-slate-700">
+                          {copies} {copies === 1 ? "copy" : "copies"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </section>
 
                 {/* Sticky Bottom Price Bar */}
-                <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-slate-200 px-5 py-3.5 shadow-lg">
-                  <div className="mx-auto max-w-md flex items-center justify-between">
+                <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-5 py-3.5 shadow-xl">
+                  <div className="mx-auto max-w-md flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">
-                        Kul Raqam (Cash at counter)
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        Kul Raqam (Counter cash)
                       </p>
-                      <div className="flex items-baseline space-x-1">
-                        <span className="text-2xl font-black text-slate-900">
+                      <div className="flex items-baseline space-x-1.5">
+                        <span className="text-2xl font-black text-slate-950">
                           Rs. {quote ? quote.total : "..."}
                         </span>
                         {quote && (
-                          <span className="text-xs text-slate-500">
-                            ({quote.printedPages}{" "}
-                            {quote.printedPages === 1 ? "page" : "pages"})
+                          <span className="text-xs text-slate-500 font-medium">
+                            ({quote.printedPages} {quote.printedPages === 1 ? "page" : "pages"})
                           </span>
                         )}
                       </div>
@@ -643,12 +682,12 @@ export default function ShopOrderPage() {
                     <button
                       type="submit"
                       disabled={submitting || !customerName.trim()}
-                      className="bg-blue-700 hover:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl shadow-sm transition flex items-center space-x-2"
+                      className="bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-2xl shadow-md transition-all flex items-center space-x-2 active:scale-98"
                     >
                       {submitting ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Submit...</span>
+                          <span>Bhej rahe hain...</span>
                         </>
                       ) : (
                         <>

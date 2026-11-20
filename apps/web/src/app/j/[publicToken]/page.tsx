@@ -13,6 +13,9 @@ import {
   RotateCcw,
   Store,
   ChevronLeft,
+  Copy,
+  Check,
+  FileText,
 } from "lucide-react";
 import { fetchJobStatus, cancelPrintJob, JobStatusInfo } from "@/lib/api";
 import { JobStatus } from "@chhapai/shared";
@@ -25,9 +28,17 @@ export default function TokenStatusPage() {
   const [job, setJob] = useState<JobStatusInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+
+  const handleCopyToken = () => {
+    if (!job?.tokenLabel) return;
+    navigator.clipboard.writeText(job.tokenLabel);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Poll every 3 seconds per PRD Section 3.1 Step 7
   useEffect(() => {
@@ -129,19 +140,35 @@ export default function TokenStatusPage() {
       </header>
 
       {/* Hero Token Card */}
-      <div className="bg-gradient-to-b from-blue-700 to-blue-800 text-white rounded-3xl p-6 text-center shadow-md space-y-4">
-        <p className="text-xs font-semibold tracking-wider uppercase text-blue-200">
+      <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white rounded-3xl p-6 text-center shadow-xl space-y-4 relative overflow-hidden ring-4 ring-blue-100">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+        
+        <p className="text-xs font-bold tracking-widest uppercase text-blue-200">
           Aapka Token Number
         </p>
 
-        <div className="py-2">
-          <span className="text-6xl font-black tracking-tight tracking-wide drop-shadow-sm">
+        <div className="py-2 flex items-center justify-center gap-3">
+          <span className="text-6xl font-black tracking-tight font-mono drop-shadow-md">
             {job.tokenLabel}
           </span>
+          <button
+            type="button"
+            onClick={handleCopyToken}
+            title="Token Copy Karein"
+            className="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all shadow-inner"
+          >
+            {copied ? <Check className="w-5 h-5 text-emerald-300" /> : <Copy className="w-5 h-5" />}
+          </button>
         </div>
 
-        <div className="inline-flex items-center space-x-2 bg-blue-900/60 rounded-full px-4 py-1.5 text-xs font-medium text-blue-100">
-          <Banknote className="w-3.5 h-3.5 text-amber-300" />
+        {copied && (
+          <p className="text-[11px] font-semibold text-emerald-300 animate-fade-in">
+            ✓ Token clipboard par copy ho gaya!
+          </p>
+        )}
+
+        <div className="inline-flex items-center space-x-2 bg-black/25 backdrop-blur-xs rounded-full px-4 py-1.5 text-xs font-semibold text-blue-100 border border-white/10">
+          <Banknote className="w-4 h-4 text-amber-300" />
           <span>Kul Raqam: Rs. {job.total} (Cash at counter)</span>
         </div>
       </div>
