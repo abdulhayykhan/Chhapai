@@ -2,6 +2,10 @@
 
 > **Walk-in QR-based self-service printing system for print shops in Pakistan.**
 
+**Live Customer Web App:** [https://chhapai-web.vercel.app](https://chhapai-web.vercel.app)  
+**Cloud Managed Database:** Supabase PostgreSQL (`ap-south-1` Mumbai)  
+**Desktop App Mode:** Zero-Click Auto-Starting Server (Double-click app icon to start API + Counter App)
+
 Chhapai eliminates the traditional, messy walk-in printing workflow in Pakistan (emailing files, passing USB drives, or WhatsApping documents to a crowded shop counter). 
 
 Customers simply scan a counter QR code on their mobile phone, upload their document (`.pdf`, `.docx`, `.xlsx`, `.pptx`, `.jpg`, `.png`), customize print options (pages, copies, color vs. black & white, single vs. double-sided), see an instant transparent quote in Pakistani Rupees (PKR), and receive a short numeric token (e.g. `#042`). 

@@ -85,3 +85,15 @@ This document records all architectural decisions, especially where requirements
   3. `apps/desktop`: 14 tests verifying queue categorization, sound chimes, price overrides, CSV exports, SumatraPDF worker options mapping, printer routing, and startup backlog sync.
   4. `apps/web`: Playwright mobile viewport E2E test executing the customer flow from QR scan landing to token generation and realtime status updates.
 - **Rationale:** Ensures zero regressions across all components and validates 100% adherence to PRD Section 16 before release.
+
+---
+
+## Decision 009: Zero-Click Embedded Desktop Auto-Start & 100% Free Cloud Architecture
+
+- **Date:** 2026-11-21
+- **Context:** Free cloud hosting platforms (such as Render) enforce a 15-minute inactivity spin-down, causing 40-50 second cold starts and frequent WebSocket dropouts for walk-in print shop customers. Requiring a shopkeeper to manually run local servers or terminal commands every morning introduces friction and operational risk.
+- **Decision:** 
+  1. Embedded Background Process Manager in `apps/desktop/src/main/serverManager.ts`: When the shopkeeper launches the Windows desktop app, Electron automatically checks if an API instance is running on port 3001; if not, it spawns the NestJS backend as a silent child process (`fork`), connecting to cloud-managed Supabase PostgreSQL (`ap-south-1`).
+  2. Public Customer Portal on Vercel: The mobile customer web app (`apps/web`) is deployed directly to Vercel (`https://chhapai-web.vercel.app`), ensuring 24/7 availability, zero cold starts, and global CDN delivery at $0 cost.
+  3. Clean Lifecycle Management: When the desktop app is minimized to the system tray, the local API continues processing prints. When the app is quit, all child processes terminate cleanly.
+- **Rationale:** Delivers a 100% free, zero-maintenance operational model for the shopkeeper—no manual server startup, no terminal windows, and zero cold-start latency for walk-in customers.
