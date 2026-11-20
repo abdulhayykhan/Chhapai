@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-chhapai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-chhapai_secret_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-chhapai_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-chhapai} -d ${POSTGRES_DB:-chhapai_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chhapai-network
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-chhapai}:${POSTGRES_PASSWORD:-chhapai_secret_pw}@db:5432/${POSTGRES_DB:-chhapai_db}?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-access_secret_production_random_key_32c}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-refresh_secret_production_random_key_32c}
+      PUBLIC_WEB_URL: ${PUBLIC_WEB_URL:-https://${DOMAIN:-localhost}}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://${DOMAIN:-localhost},https://www.${DOMAIN:-localhost}}
+      STORAGE_PATH: /data/files
+      TZ: Asia/Karachi
+      SEED_SHOP_SLUG: ${SEED_SHOP_SLUG:-default}
+      SEED_SHOP_NAME: ${SEED_SHOP_NAME:-Chhapai Print Shop}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@chhapai.pk}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-AdminPassword123!}
+    volumes:
+      - files_data:/data/files
+    networks:
+      - chhapai-network
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.${DOMAIN:-localhost}/api/v1}
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.${DOMAIN:-localhost}/api/v1}
+    networks:
+      - chhapai-network
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      API_DOMAIN: ${API_DOMAIN:-api.${DOMAIN:-localhost}}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+    networks:
+      - chhapai-network
+
+volumes:
+  pgdata:
+  files_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  chhapai-network:
+    driver: bridge

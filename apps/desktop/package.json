@@ -11,7 +11,40 @@
     "dev:renderer": "vite",
     "dev:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --external:pdf-to-printer --outfile=dist/main/index.js && esbuild src/preload/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/preload/index.js",
     "start": "electron .",
+    "package": "pnpm run build && electron-builder --win",
     "test": "vitest run"
+  },
+  "build": {
+    "appId": "pk.chhapai.counter",
+    "productName": "Chhapai",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/pdf-to-printer/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Chhapai"
+    }
   },
   "dependencies": {
     "@chhapai/shared": "workspace:*",

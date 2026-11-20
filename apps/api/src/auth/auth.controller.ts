@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
 } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service.js";
 import { JwtAuthGuard } from "./jwt-auth.guard.js";
 import { CurrentUser } from "./current-user.decorator.js";
@@ -17,6 +18,7 @@ import { ErrorCode } from "@chhapai/shared";
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
+  @Throttle({ login: { limit: 5, ttl: 60000 } })
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: any) {

@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
 } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { PublicService } from "./public.service.js";
 import {
@@ -27,6 +28,7 @@ export class PublicController {
     return this.publicService.getShopBySlug(slug);
   }
 
+  @Throttle({ uploads: { limit: 10, ttl: 3600000 } })
   @Post("shops/:slug/uploads")
   @UseInterceptors(FileInterceptor("file"))
   @HttpCode(HttpStatus.OK)
@@ -55,6 +57,7 @@ export class PublicController {
     return this.publicService.calculateQuote(parsed.data);
   }
 
+  @Throttle({ jobs: { limit: 20, ttl: 3600000 } })
   @Post("jobs")
   @HttpCode(HttpStatus.OK)
   async createJob(@Body() body: any) {
