@@ -17,6 +17,7 @@ RUN pnpm --filter @chhapai/shared build
 
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV BUILD_STANDALONE=true
 
 RUN pnpm --filter @chhapai/web build
 
