@@ -4,12 +4,12 @@
   "private": true,
   "main": "dist/main/index.js",
   "scripts": {
-    "build:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/main/index.js",
+    "build:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --external:pdf-to-printer --outfile=dist/main/index.js",
     "build:preload": "esbuild src/preload/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/preload/index.js",
     "build:renderer": "vite build",
     "build": "pnpm run build:main && pnpm run build:preload && pnpm run build:renderer",
     "dev:renderer": "vite",
-    "dev:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/main/index.js && esbuild src/preload/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/preload/index.js",
+    "dev:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --external:electron --external:pdf-to-printer --outfile=dist/main/index.js && esbuild src/preload/index.ts --bundle --platform=node --target=node20 --external:electron --outfile=dist/preload/index.js",
     "start": "electron .",
     "test": "vitest run"
   },
@@ -17,6 +17,7 @@
     "@chhapai/shared": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
+    "pdf-to-printer": "^5.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "socket.io-client": "^4.8.1",

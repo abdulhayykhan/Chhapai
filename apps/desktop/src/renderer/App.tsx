@@ -4,7 +4,7 @@ import { adminApi } from "./lib/api";
 import { adminSocket } from "./lib/socket";
 import { storage } from "./lib/storage";
 import { triggerDesktopAlert } from "./lib/sound";
-import { printWorker } from "./lib/printWorkerStub";
+import { printWorker } from "./lib/printWorker";
 import { Header } from "./components/Header";
 import { OfflineBanner } from "./components/OfflineBanner";
 import { QueuePane } from "./components/QueuePane";

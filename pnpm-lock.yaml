@@ -311,6 +311,9 @@ importers:
       lucide-react:
         specifier: ^0.468.0
         version: 0.468.0(react@18.3.1)
+      pdf-to-printer:
+        specifier: ^5.8.1
+        version: 5.8.1
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -2795,6 +2798,9 @@ packages:
 
   pdf-lib@1.17.1:
     resolution: {integrity: sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==}
+
+  pdf-to-printer@5.8.1:
+    resolution: {integrity: sha512-bVMrGbBiVw8G/z0b28DhMguoJa8rqbVcbfLtpQzGUJ7eaq188JA2AxsFeuFQwWxAvMCa1Hyh8vXc2QybQVrPrw==}
 
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
@@ -5727,6 +5733,8 @@ snapshots:
       '@pdf-lib/upng': 1.0.1
       pako: 1.0.11
       tslib: 1.14.1
+
+  pdf-to-printer@5.8.1: {}
 
   pend@1.2.0: {}
 

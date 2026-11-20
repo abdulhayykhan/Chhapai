@@ -9,6 +9,11 @@ import {
 } from "electron";
 import path from "path";
 import fs from "fs";
+import os from "os";
+import {
+  print as printPdfToPrinter,
+  getPrinters as getSystemPrinters,
+} from "pdf-to-printer";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -145,35 +150,104 @@ function writeStoredData(data: Record<string, any>): void {
 function setupIpcHandlers() {
   // 1. printers:list
   ipcMain.handle("printers:list", async () => {
+    try {
+      const printers = await getSystemPrinters();
+      if (Array.isArray(printers) && printers.length > 0) {
+        return printers.map((p: any) => (typeof p === "string" ? p : p.name));
+      }
+    } catch (err) {
+      console.warn(
+        "pdf-to-printer getPrinters failed, falling back to Electron webContents:",
+        err,
+      );
+    }
+
     if (mainWindow) {
       try {
-        const printers = await mainWindow.webContents.getPrintersAsync();
-        return printers.map((p) => p.name);
+        const webPrinters = await mainWindow.webContents.getPrintersAsync();
+        if (webPrinters.length > 0) {
+          return webPrinters.map((p) => p.name);
+        }
       } catch (err) {
-        console.error("Failed to get printers:", err);
+        console.error("Failed to get webContents printers:", err);
       }
     }
-    return [
-      "Default Printer",
-      "Microsoft Print to PDF",
-      "Canon LBP2900",
-      "HP LaserJet Pro",
-    ];
+
+    return ["Microsoft Print to PDF"];
   });
 
-  // 2. print:pdf (Stubbed in M5)
+  // 2. print:pdf (Real pdf-to-printer / SumatraPDF integration)
   ipcMain.handle("print:pdf", async (_event, params) => {
-    console.log("[PrintWorker Stub] Print request received:", {
-      copies: params.copies,
-      duplex: params.duplex,
-      monochrome: params.monochrome,
-      printer: params.printer,
-      sizeBytes: params.fileData ? params.fileData.byteLength : 0,
-    });
+    const tempDir = path.join(os.tmpdir(), "chhapai");
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
 
-    // In M5, simulate 1.5s print spool time
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    return { success: true };
+    const tempFilePath = path.join(
+      tempDir,
+      `print-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.pdf`,
+    );
+
+    try {
+      if (!params.fileData || params.fileData.byteLength === 0) {
+        throw new Error("Khali file data mila (Empty PDF data)");
+      }
+
+      const buffer = Buffer.from(params.fileData);
+      fs.writeFileSync(tempFilePath, buffer);
+
+      const printOptions: any = {
+        silent: true,
+        copies: params.copies || 1,
+        monochrome: params.monochrome ?? true,
+        side: params.duplex ? "duplexlong" : "simplex",
+      };
+
+      if (params.printer) {
+        printOptions.printer = params.printer;
+      }
+      if (params.pages) {
+        printOptions.pages = params.pages;
+      }
+      if (params.paperSize) {
+        printOptions.paperSize = params.paperSize;
+      }
+
+      console.log("[PrintWorker Main] Printing via pdf-to-printer:", {
+        printer: printOptions.printer,
+        copies: printOptions.copies,
+        pages: printOptions.pages,
+        side: printOptions.side,
+        monochrome: printOptions.monochrome,
+        tempFile: tempFilePath,
+      });
+
+      await printPdfToPrinter(tempFilePath, printOptions);
+
+      console.log(
+        "[PrintWorker Main] Print command successfully delivered to Windows spooler.",
+      );
+      return { success: true };
+    } catch (err: any) {
+      console.error("[PrintWorker Main] pdf-to-printer execution error:", err);
+      return {
+        success: false,
+        error:
+          err?.message || "Print Windows spooler tak pohnchane me masla aya",
+      };
+    } finally {
+      // Ensure temp PDF file is cleaned up from disk
+      try {
+        if (fs.existsSync(tempFilePath)) {
+          fs.unlinkSync(tempFilePath);
+        }
+      } catch (cleanupErr) {
+        console.warn(
+          "[PrintWorker Main] Failed to clean up temp file:",
+          cleanupErr,
+        );
+      }
+    }
   });
 
   // 3. app:version
