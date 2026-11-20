@@ -1,0 +1,69 @@
+{
+  "brand": {
+    "name": "Chhapai",
+    "tagline": "Scan karein, Upload karein, Print karein."
+  },
+  "upload": {
+    "shopClosed": "Dukan filhal band hai. Upload ki ijazat nahi hai.",
+    "acceptedFormats": "PDF, Word, Excel, PowerPoint, Images (JPG, PNG)",
+    "selectOrDrop": "File select karein ya yahan drop karein",
+    "maxLimits": "Max {maxFileMb} MB, max {maxPages} pages",
+    "privacyNotice": "Aapki file printing ke baad server se delete kar di jaye gi.",
+    "converting": "Document convert aur pages count ho rahe hain...",
+    "uploading": "File upload ho rahi hai..."
+  },
+  "settings": {
+    "title": "Print Settings",
+    "copies": "Copies",
+    "colorMode": "Rang (Color)",
+    "bw": "Black & White (B/W)",
+    "color": "Color",
+    "sides": "Sides",
+    "singleSided": "Single Sided (Ek taraf)",
+    "doubleSided": "Double Sided (Dono taraf)",
+    "paperSize": "Paper Size",
+    "pageRange": "Page Range",
+    "pageRangePlaceholder": "Tamam pages ke liye khali chhorein (ya 1-3, 5, 8-10)",
+    "customerDetails": "Aapki Maloomat",
+    "customerName": "Aapka Naam",
+    "customerNamePlaceholder": "Naam likhein",
+    "customerPhone": "Phone Number (Ikhtiyari)",
+    "customerPhonePlaceholder": "03001234567",
+    "priceEstimate": "Kul Qeemat (PKR)",
+    "submitBtn": "Print Order Submit Karein",
+    "submitting": "Submit ho raha hai..."
+  },
+  "token": {
+    "title": "Aapka Token Number",
+    "payNotice": "Counter par cash ada karein",
+    "cancelBtn": "Order Cancel Karein",
+    "cancelConfirm": "Kya aap waqayi apna print order cancel karna chahte hain?",
+    "summary": "Order Tafseelat",
+    "total": "Total Amount",
+    "status": {
+      "PENDING_APPROVAL": "Approval ka intezar hai...",
+      "APPROVED": "Job approve ho gaya, printing queue mein hai",
+      "PRINTING": "Print ho raha hai...",
+      "COMPLETED": "Print tayyar hai, counter se collect karein!",
+      "REJECTED": "Job reject ho gaya",
+      "FAILED": "Printing mein masla aaya, counter par rabta karein",
+      "CANCELLED": "Job cancel ho gaya",
+      "EXPIRED": "Job expire ho gaya"
+    }
+  },
+  "errors": {
+    "FILE_TOO_LARGE": "File ka size bohot bara hai",
+    "UNSUPPORTED_FILE_TYPE": "Yeh file format support nahi karta",
+    "CONVERSION_FAILED": "File convert karne mein masla aaya, PDF upload karein",
+    "TOO_MANY_PAGES": "Pages ki tadaad limit se zyada hai",
+    "PDF_PROTECTED": "Password-protected PDF upload nahi ho sakti",
+    "SHOP_CLOSED": "Dukan filhal band hai",
+    "INVALID_PAGE_RANGE": "Page range durust nahi hai (misal: 1-3, 5)",
+    "UPLOAD_EXPIRED": "Upload session expire ho gaya hai, dobara upload karein",
+    "JOB_NOT_FOUND": "Job nahi mila",
+    "INVALID_STATE_TRANSITION": "Invalid status transition",
+    "UNAUTHORIZED": "Login required",
+    "RATE_LIMITED": "Bohot zyada requests, thori der baad koshish karein",
+    "VALIDATION_ERROR": "Maloomat durust nahi hain"
+  }
+}
