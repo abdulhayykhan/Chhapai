@@ -43,8 +43,8 @@ export const Header: React.FC<Props> = ({
       {/* Brand & Shop info */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-white font-black text-xl shadow-inner">
-            چھ
+          <div className="px-3 h-9 rounded-lg bg-primary flex items-center justify-center text-white font-black text-lg shadow-inner">
+            چھپائی
           </div>
           <div>
             <div className="flex items-center gap-2">

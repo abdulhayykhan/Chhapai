@@ -111,8 +111,8 @@ export const QrPosterModal: React.FC<Props> = ({ shop, onClose }) => {
             className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-300 p-8 text-center flex flex-col items-center"
           >
             {/* Poster Header */}
-            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-3xl shadow-md mb-3">
-              چھ
+            <div className="px-4 py-2 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-2xl shadow-md mb-3">
+              چھپائی
             </div>
             <h1 className="text-3xl font-black text-slate-950 tracking-tight">
               Chhapai

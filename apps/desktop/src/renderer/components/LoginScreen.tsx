@@ -56,8 +56,8 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
         {/* Top Header */}
         <div className="bg-primary p-8 text-center text-white relative overflow-hidden">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-4xl mx-auto mb-3 shadow-inner">
-            چھ
+          <div className="px-5 py-2 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-3xl mx-auto mb-3 shadow-inner inline-flex">
+            چھپائی
           </div>
           <h1 className="text-2xl font-black tracking-tight">
             Chhapai Counter
