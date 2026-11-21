@@ -41,3 +41,6 @@ coverage/
 test-results/
 playwright-report/
 supabase/.temp/
+
+# Documents & PDFs
+*.pdf
