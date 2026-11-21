@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { adminApi, getServerUrl } from "../lib/api";
 import { AdminUser } from "../types";
 import {
@@ -8,6 +8,7 @@ import {
   ChevronUp,
   AlertCircle,
   ShieldCheck,
+  RefreshCw,
 } from "lucide-react";
 
 interface Props {
@@ -21,6 +22,38 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [serverStatus, setServerStatus] = useState<{
+    isRunning: boolean;
+    isEmbedded: boolean;
+    port: number;
+    error?: string;
+  } | null>(null);
+  const [isRestartingServer, setIsRestartingServer] = useState(false);
+
+  useEffect(() => {
+    const checkStatus = () => {
+      if ((window as any).electronAPI?.getServerStatus) {
+        (window as any).electronAPI.getServerStatus().then(setServerStatus);
+      }
+    };
+    checkStatus();
+    const interval = setInterval(checkStatus, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleRestartServer = async () => {
+    if (!(window as any).electronAPI?.restartServer) return;
+    setIsRestartingServer(true);
+    setErrorMsg(null);
+    try {
+      const res = await (window as any).electronAPI.restartServer();
+      setServerStatus(res);
+    } catch (err: any) {
+      setErrorMsg(`Server restart na ho saka: ${err?.message || err}`);
+    } finally {
+      setIsRestartingServer(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +140,39 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
               placeholder="••••••••••••"
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
+          </div>
+
+          {/* Backend Status Indicator */}
+          <div className="flex items-center justify-between text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  serverStatus?.isRunning
+                    ? "bg-emerald-500 shadow-sm shadow-emerald-400"
+                    : "bg-amber-500 animate-pulse"
+                }`}
+              />
+              <span className="font-medium">
+                {serverStatus?.isRunning
+                  ? `Backend Server Active (Port ${serverStatus.port})`
+                  : serverStatus?.error
+                  ? `Backend: ${serverStatus.error.slice(0, 45)}...`
+                  : "Local backend shuru ho raha hai..."}
+              </span>
+            </div>
+            {!serverStatus?.isRunning && (window as any).electronAPI?.restartServer && (
+              <button
+                type="button"
+                onClick={handleRestartServer}
+                disabled={isRestartingServer}
+                className="text-primary hover:underline font-bold text-[10px] flex items-center gap-1"
+              >
+                <RefreshCw
+                  className={`w-3 h-3 ${isRestartingServer ? "animate-spin" : ""}`}
+                />
+                <span>Restart</span>
+              </button>
+            )}
           </div>
 
           {/* Advanced Server URL toggle */}

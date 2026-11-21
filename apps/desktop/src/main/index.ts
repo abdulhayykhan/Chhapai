@@ -7,6 +7,7 @@ import {
   nativeImage,
   safeStorage,
   shell,
+  net,
 } from "electron";
 import path from "path";
 import fs from "fs";
@@ -64,7 +65,8 @@ function createWindow() {
       preload: path.join(__dirname, "../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
+      webSecurity: false,
       backgroundThrottling: false,
     },
   });
@@ -342,6 +344,50 @@ function setupIpcHandlers() {
     if (typeof url === "string" && (url.startsWith("http:") || url.startsWith("https:"))) {
       return shell.openExternal(url);
     }
+  });
+
+  // 11. api:fetch (Main process native fetch - zero CORS/PNA restrictions)
+  ipcMain.handle("api:fetch", async (_event, { url, options }) => {
+    try {
+      const fetchOpts: any = {
+        method: options?.method || "GET",
+        headers: options?.headers || {},
+      };
+      if (options?.body) {
+        fetchOpts.body = options.body;
+      }
+      const res = await net.fetch(url, fetchOpts);
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = text;
+      }
+      return {
+        status: res.status,
+        ok: res.ok,
+        headers: Object.fromEntries(res.headers.entries()),
+        data,
+        text,
+      };
+    } catch (err: any) {
+      console.error("[Main net.fetch error]:", err);
+      return {
+        status: 0,
+        ok: false,
+        headers: {},
+        data: null,
+        text: err?.message || "Network request failed",
+        error: err?.message || "Network request failed",
+      };
+    }
+  });
+
+  // 12. server:restart
+  ipcMain.handle("server:restart", async () => {
+    serverManager.stop();
+    return await serverManager.start();
   });
 }
 

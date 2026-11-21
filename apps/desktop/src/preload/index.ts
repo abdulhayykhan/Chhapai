@@ -10,6 +10,15 @@ export interface PrintParams {
   printer?: string;
 }
 
+export interface FetchResponse {
+  status: number;
+  ok: boolean;
+  headers: Record<string, string>;
+  data: any;
+  text: string;
+  error?: string;
+}
+
 export interface ElectronAPI {
   getPrinters: () => Promise<string[]>;
   printPdf: (
@@ -28,6 +37,8 @@ export interface ElectronAPI {
     tunnelUrl: string | null;
     error?: string;
   }>;
+  restartServer: () => Promise<any>;
+  apiFetch: (url: string, options?: any) => Promise<FetchResponse>;
   openExternal: (url: string) => Promise<void>;
 }
 
@@ -43,6 +54,9 @@ const electronAPI: ElectronAPI = {
     ipcRenderer.invoke("store:set", key, value),
   deleteStore: (key: string) => ipcRenderer.invoke("store:delete", key),
   getServerStatus: () => ipcRenderer.invoke("server:status"),
+  restartServer: () => ipcRenderer.invoke("server:restart"),
+  apiFetch: (url: string, options?: any) =>
+    ipcRenderer.invoke("api:fetch", { url, options }),
   openExternal: (url: string) => ipcRenderer.invoke("app:openExternal", url),
 };
 

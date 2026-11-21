@@ -44,6 +44,42 @@ async function request<T>(
     headers["Authorization"] = `Bearer ${currentAccessToken}`;
   }
 
+  // If in Electron, use main process net.fetch (immune to file:// CORS and Private Network Access blocks)
+  if (
+    typeof window !== "undefined" &&
+    (window as any).electronAPI?.apiFetch
+  ) {
+    const res = await (window as any).electronAPI.apiFetch(url, {
+      ...options,
+      headers,
+    });
+
+    if (res.status === 401 && retryOn401) {
+      const refreshed = await tryRefreshToken();
+      if (refreshed) {
+        return request<T>(path, options, false);
+      }
+    }
+
+    if (!res.ok) {
+      const errorJson = typeof res.data === "object" ? res.data : null;
+      const msg =
+        errorJson?.error?.message ||
+        errorJson?.message ||
+        (res.status === 0
+          ? "Server se rabta nahi ho saka (Connection Refused). Local server offline hai ya start ho raha hai."
+          : `HTTP Error ${res.status}`);
+      const code = errorJson?.error?.code || (res.status === 0 ? "CONNECTION_REFUSED" : "UNKNOWN_ERROR");
+      const err = new Error(msg);
+      (err as any).code = code;
+      (err as any).status = res.status;
+      throw err;
+    }
+
+    return res.data as T;
+  }
+
+  // Fallback to standard fetch
   const res = await fetch(url, { ...options, headers });
 
   if (res.status === 401 && retryOn401) {
@@ -76,11 +112,35 @@ async function tryRefreshToken(): Promise<boolean> {
   const refreshToken = await storage.get<string>("refresh_token");
   if (!refreshToken) return false;
 
+  const url = `${currentServerUrl}/auth/refresh`;
+  const body = JSON.stringify({ refreshToken });
+
   try {
-    const res = await fetch(`${currentServerUrl}/auth/refresh`, {
+    if (
+      typeof window !== "undefined" &&
+      (window as any).electronAPI?.apiFetch
+    ) {
+      const res = await (window as any).electronAPI.apiFetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+      });
+      if (!res.ok) {
+        await storage.delete("refresh_token");
+        currentAccessToken = null;
+        return false;
+      }
+      currentAccessToken = res.data?.accessToken;
+      if (res.data?.refreshToken) {
+        await storage.set("refresh_token", res.data.refreshToken);
+      }
+      return true;
+    }
+
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      body,
     });
     if (!res.ok) {
       await storage.delete("refresh_token");
