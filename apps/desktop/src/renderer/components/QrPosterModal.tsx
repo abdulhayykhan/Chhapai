@@ -58,7 +58,7 @@ export const QrPosterModal: React.FC<Props> = ({ shop, onClose }) => {
     window.print();
   };
 
-  const shopUrl = `${getServerUrl().replace(":4000", ":3000")}/s/${shop?.slug || "default"}`;
+  const shopUrl = `${getServerUrl().replace(":3001", ":3000")}/s/${shop?.slug || "default"}`;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">

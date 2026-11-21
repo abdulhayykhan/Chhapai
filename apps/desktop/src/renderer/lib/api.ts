@@ -1,7 +1,7 @@
 import { storage } from "./storage";
 import { PrintJobDto, Shop, AdminUser, DailyReportDto } from "../types";
 
-let currentServerUrl = "http://localhost:4000";
+let currentServerUrl = "http://localhost:3001";
 let currentAccessToken: string | null = null;
 
 export function getServerUrl(): string {

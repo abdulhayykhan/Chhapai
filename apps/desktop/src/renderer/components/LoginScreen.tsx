@@ -130,7 +130,7 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
                   type="text"
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
-                  placeholder="http://localhost:4000"
+                  placeholder="http://localhost:3001"
                   className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:border-primary"
                 />
               </div>
