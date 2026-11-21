@@ -1,6 +1,8 @@
 # Chhapai (چھپائی) — Production Deployment & Setup Guide
 
-Yeh document ek fresh Ubuntu VPS par **Chhapai** system ko Docker Compose aur Caddy ke sath deploy karne aur shop PC par Windows Desktop app chalane ka mukammal tareeqa faraham karta hai.
+Yeh document **Chhapai** system ke do mukhtalif deployment models ki tafseelat faraham karta hai:
+1. **Mode 1 (100% Free Zero-Cost Model - Recommended):** Customer portal Vercel par, database Supabase free cloud par, aur shop counter par standalone All-in-One Windows installer (`Chhapai Setup 1.0.0.exe`) jisme backend API khud embedded hai (bila kisi monthly server kharche ke).
+2. **Mode 2 (Self-Hosted Linux VPS Model):** Agar dukan ka apna dedicated Ubuntu VPS server ho to Docker Compose aur Caddy ke zariye complete self-hosted setup.
 
 ---
 
@@ -151,28 +153,38 @@ ls -lh /var/backups/chhapai/
 
 ---
 
-## 6. Shop Windows Counter App Setup
+## 6. Shop Windows Counter App Setup (All-in-One Standalone Installer)
 
-Shop ke Windows PC par operator counter application chalane ke steps:
+Chhapai v1.0.0+ me shop counter PC ke liye **Standalone All-in-One Installer** (`Chhapai Setup 1.0.0.exe`) faraham kia gaya hai. Is installer ke andar Electron UI ke sath sath **NestJS Backend API, Prisma Engine, aur SumatraPDF** pehle se embedded hain. Dukan ke computer par alag se Node.js, terminal, ya koi server command chalane ki bilkul zaroorat nahi hai.
 
-1. **Installer Download / Build:**
-   Monorepo se Windows installer build karein:
-   ```powershell
-   pnpm --filter @chhapai/desktop build
-   # Installer output: apps/desktop/release/Chhapai-Setup-1.0.0.exe
-   ```
-2. **Installation:**
-   `Chhapai-Setup-1.0.0.exe` run karein. Yeh desktop aur start menu shortcut khud bana dega.
-3. **Login:**
-   - App khol kar **Email** (`admin@yourshop.pk`) aur **Password** darj karein.
-   - Advanced options me agar custom API server URL ho to `https://api.yourshop.pk` set karein.
-4. **Printer Selection (Settings):**
-   - Top right se **Settings** button dabayein.
-   - Siyah/Safaid (B/W) aur Rangeen (Color) printers dropdown se muntakhib karein.
-   - **Auto-Print ON** karein aur **"Windows ke sath start karein"** check karein.
-5. **QR Code Counter Poster:**
-   - Header me **QR Poster** button dabayein.
-   - **Poster Print Karein** daba kar A4 poster print karein aur dukan ke counter pe lagayein.
+1. **Installer Download Karein:**
+   - GitHub Releases page se `Chhapai Setup 1.0.0.exe` download karein:
+     `https://github.com/abdulhayykhan/Chhapai/releases/tag/v1.0.0`
+   - *(Agar khud compile karna ho to root directory se `pnpm --filter @chhapai/desktop package` run karein)*.
+
+2. **Installation & Automatic Background Server:**
+   - `Chhapai Setup 1.0.0.exe` par double-click karein. Yeh desktop aur Start Menu shortcut bana dega.
+   - Jaise hi aap app open karenge, Electron ka internal server manager check karega ke port 3001 active hai ya nahi. Agar active nahi hoga to embedded NestJS backend API background me khamoshi se start hojayegi aur Supabase cloud PostgreSQL database se connect hojayegi.
+
+3. **Login Karein:**
+   - Default Administrator Credentials:
+     - **Email:** `admin@chhapai.com`
+     - **Password:** `SuperSecurePassword123!`
+     - **Server URL:** `http://localhost:3001` (Yeh pehle se set hota hai, kisi change ki zaroorat nahi).
+   - "Login Karein" button dabayein.
+
+4. **Printers Configure Karein (Settings):**
+   - Counter dashboard par top-right se **Settings** icon dabayein.
+   - **Black & White Printer** aur **Color Printer** dropdown se apne physical printers select karein.
+   - **Auto-Print Mode** on karein taake customer ke approve hone wale orders foran print ho saken.
+
+5. **Counter QR Code Poster Print Karein:**
+   - Top bar se **QR Poster** button dabayein.
+   - **Poster Print Karein** daba kar A4 counter poster print karein aur dukan ke counter par chipka dein. Walk-in customers is QR code ko scan karke direct apne mobile se files upload kar sakenge.
+
+6. **Process Lifecycle Management:**
+   - Jab aap application ko minimize karte hain, yeh Windows System Tray me chali jati hai aur background me orders process karti rehti hai.
+   - Jab aap app ko quit karte hain, to embedded backend API processes bhi cleanly terminate hojate hain.
 
 ---
 

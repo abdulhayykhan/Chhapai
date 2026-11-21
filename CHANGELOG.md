@@ -27,6 +27,8 @@ Chhapai is an open-source, self-service walk-in printing system purpose-built fo
 
 #### Desktop Counter Application (`apps/desktop`)
 - Standalone Electron 31 Windows application with NSIS installer (`Chhapai Setup 1.0.0.exe`).
+- Embedded All-in-One Backend Architecture: Bundled complete NestJS backend API, native Windows Prisma query engine DLL, and production dependencies directly inside the Windows distribution (`resources/api`).
+- Zero-Configuration Background Server: Automatically spawns the embedded backend API on port 3001 using Electron's internal Node engine (`ELECTRON_RUN_AS_NODE: 1`), eliminating any requirement for Node.js, Git, or terminal execution on the shop counter PC.
 - Silent background printing engine integrating standalone SumatraPDF executable via `pdf-to-printer`.
 - Realtime print queue dashboard categorized into Pending, In Progress, Printed, and Cancelled tabs.
 - Auto-print toggle for hands-free processing of incoming approved print jobs.
@@ -67,6 +69,7 @@ Chhapai is an open-source, self-service walk-in printing system purpose-built fo
 - GitHub Actions CI/CD workflow building and publishing Windows NSIS installers.
 
 ### Fixed
-- Fixed default desktop API server URL from port 4000 to port 3001.
+- Fixed counter login "Failed to fetch" error by synchronizing default API port across all desktop components to 3001 and embedding the NestJS API directly into the standalone Windows installer.
 - Fixed database pooler connection configuration for cloud PostgreSQL instances.
-- Resolved race conditions in multi-terminal print job claiming.
+- Resolved race conditions in multi-terminal print job claiming with conditional SQL updates.
+- Fixed duplicate changelog links in GitHub Release by disabling automated notes generation in `.github/workflows/release.yml`.

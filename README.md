@@ -203,9 +203,9 @@ The backend API handles authentication, business validation, file persistence, a
 
 ### 5.4 Counter Terminal Desktop Application (`apps/desktop`)
 
-The desktop application provides counter operators with a fast, high-volume workflow:
+The desktop application provides counter operators with a fast, high-volume, zero-configuration workflow. In packaged production builds (`Chhapai Setup 1.0.0.exe`), the complete NestJS administrative backend API, Prisma client, and native Windows query engine DLL are embedded directly within the application's resources (`resources/api`):
 
-- Zero-Click Background Server Manager: On launch, the main process verifies port 3001. If inactive, it automatically forks `apps/api/dist/main.js` as an unprivileged child process with Supabase database connection variables.
+- Zero-Click Embedded Background API Server: On application launch, the Electron main process checks if port 3001 is listening. If inactive, it automatically executes the embedded NestJS API using Electron's internal Node runtime (`process.execPath` with `ELECTRON_RUN_AS_NODE: 1`), connecting seamlessly to the cloud-managed Supabase PostgreSQL database. The shopkeeper never needs to install Node.js, configure environment variables, or run terminal commands.
 - Persistent Real-Time Queue: Subscribes to the `/admin` Socket.IO namespace for instant updates without manual page refreshes.
 - Audio & Visual Notification: Emits a custom Web Audio chime when a new job arrives, flashes the Windows taskbar, and triggers native Windows notifications when minimized.
 - Document Preview Panel: Embeds a PDF preview viewer allowing operators to check document layout and formatting before printing.
@@ -213,7 +213,7 @@ The desktop application provides counter operators with a fast, high-volume work
 - Ergonomic Keyboard Accelerators: Operators can approve jobs using `A` or `Enter`, reject jobs using `R`, and cycle through queue items using `Arrow Up` and `Arrow Down`.
 - Daily Sales Analytics: Calculates real-time daily metrics (Total Jobs, Pages Printed, Gross Revenue in PKR, Monochrome vs Color Split) with one-click CSV report export.
 - Counter QR Poster Generator: Generates and prints custom SVG and PNG posters for the shop counter, including the shop name, phone number, and direct URL.
-- Windows System Tray Integration: Minimizes cleanly to the Windows notification tray, maintaining queue monitoring in the background.
+- Windows System Tray Integration: Minimizes cleanly to the Windows notification tray, maintaining queue monitoring and embedded API service in the background.
 
 ### 5.5 Hardware Silent Spooler Engine (`SumatraPDF`)
 
@@ -237,11 +237,11 @@ Chhapai is designed to run entirely on free cloud tiers and local PC compute, el
 | Cloud Database | Supabase Free Tier | 500 MB Postgres (ap-south-1) | Stores relational schema, shop configurations, pricing models, and job metadata. |
 | API & Worker Compute | Local Shop PC | Host Windows Hardware | Runs embedded NestJS API, local file conversion, and silent SumatraPDF spooling. |
 
-### Rationale: Avoiding Free Cloud Container Hibernation
+### Rationale: Avoiding Free Cloud Container Hibernation & Paid VPS Costs
 
-Free container platforms (such as Render or Koyeb) hibernate after 15 minutes of inactivity. When a customer walks in to print, waking up a hibernating container introduces a cold start delay of 40 to 50 seconds and disconnects WebSockets, making them unsuitable for retail counters. 
+Free container platforms (such as Render or Koyeb) hibernate after 15 minutes of inactivity. When a walk-in customer arrives to print, waking up a hibernating cloud container introduces a cold start delay of 40 to 50 seconds and terminates persistent WebSockets, creating unacceptable counter friction. Conversely, renting dedicated cloud VPS servers incurs unnecessary monthly costs for small retail print shops.
 
-By running the API directly on the shopkeeper's PC through Electron's background server manager, Chhapai delivers instant responses, local hardware access, and zero ongoing server expenses.
+By embedding the complete NestJS backend API directly inside the standalone Windows desktop installer (`Chhapai Setup 1.0.0.exe`), the counter PC itself acts as the secure, zero-latency server host whenever the shop is open. Electron manages the backend API lifecycle silently in the background, connecting directly to the Supabase cloud PostgreSQL pooler over encrypted TLS. This provides instant response times, reliable local hardware printer access, and true zero-cost operations.
 
 ---
 
@@ -392,32 +392,39 @@ pnpm --filter @chhapai/desktop dev
 
 ## 10. Packaging & Windows Release Workflow
 
-The desktop application compiles into a standalone Windows installer (`.exe`) bundling the Electron runtime, pre-compiled application assets, and unpacked SumatraPDF binaries.
+The desktop application compiles into a standalone, all-in-one Windows installer (`.exe`) bundling the Electron runtime, pre-compiled UI assets, the complete NestJS backend API with Prisma query engine binaries, and unpacked SumatraPDF silent spooling executables.
 
-### 10.1 Local Compilation
+### 10.1 All-in-One Embedded Packaging Workflow
+
+Packaging is orchestrated by `scripts/bundle-api.mjs` before invoking `electron-builder`:
+
+1. Production API Staging: Executes `pnpm --filter @chhapai/api --prod deploy` into `apps/desktop/resources/api`.
+2. Native Engine Inclusion: Detects and copies the Windows Prisma native query engine (`query_engine-windows.dll.node`) and `@prisma/client` runtime from the root pnpm store.
+3. Node Modules Protection: Renames `node_modules` to `api_modules` inside the staging folder so electron-builder default exclusion filters do not discard required backend dependencies.
+4. Runtime Restoration: On startup, `serverManager.ts` automatically restores `api_modules` or injects `NODE_PATH`, spawning the API via Electron's internal Node runtime (`process.execPath` with `ELECTRON_RUN_AS_NODE: 1`).
+
+### 10.2 Local Compilation
 
 ```bash
-# Build shared contracts and API
+# Build shared contracts and backend API
 pnpm --filter @chhapai/shared build
 pnpm --filter @chhapai/api build
 
-# Build and package desktop installer
-cd apps/desktop
-pnpm run build
-pnpm run package
+# Build UI and package the all-in-one standalone installer
+pnpm --filter @chhapai/desktop package
 ```
 
-The compiled installer is output to: `apps/desktop/release/Chhapai Setup 1.0.0.exe`.
+The compiled 179 MB standalone installer is output to: `apps/desktop/release/Chhapai Setup 1.0.0.exe`.
 
-### 10.2 Automated GitHub Actions Pipeline
+### 10.3 Automated GitHub Actions Pipeline
 
 Whenever a semantic version tag (such as `v1.0.0`) is pushed to the repository, `.github/workflows/release.yml` triggers an automated build:
 
 1. Spins up a `windows-latest` runner.
 2. Checks out the repository, initializes Node.js and pnpm.
 3. Installs dependencies and compiles shared modules.
-4. Executes `electron-builder --win --publish never`.
-5. Uploads `Chhapai Setup 1.0.0.exe` to GitHub Releases.
+4. Executes the automated packaging workflow (`pnpm --filter @chhapai/desktop package`).
+5. Uploads `Chhapai Setup 1.0.0.exe` directly to the tagged GitHub Release.
 
 ---
 

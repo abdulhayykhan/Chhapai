@@ -91,9 +91,18 @@ This document records all architectural decisions, especially where requirements
 ## Decision 009: Zero-Click Embedded Desktop Auto-Start & 100% Free Cloud Architecture
 
 - **Date:** 2026-11-21
-- **Context:** Free cloud hosting platforms (such as Render) enforce a 15-minute inactivity spin-down, causing 40-50 second cold starts and frequent WebSocket dropouts for walk-in print shop customers. Requiring a shopkeeper to manually run local servers or terminal commands every morning introduces friction and operational risk.
+- **Context:** Free cloud hosting platforms (such as Render) enforce a 15-minute inactivity spin-down, causing 40-50 second cold starts and frequent WebSocket dropouts for walk-in print shop customers. Requiring a shopkeeper to manually run local servers or terminal commands every morning introduces friction and operational risk. Furthermore, small retail print shops in Pakistan operate on slim margins and cannot justify monthly VPS hosting fees.
 - **Decision:** 
-  1. Embedded Background Process Manager in `apps/desktop/src/main/serverManager.ts`: When the shopkeeper launches the Windows desktop app, Electron automatically checks if an API instance is running on port 3001; if not, it spawns the NestJS backend as a silent child process (`fork`), connecting to cloud-managed Supabase PostgreSQL (`ap-south-1`).
-  2. Public Customer Portal on Vercel: The mobile customer web app (`apps/web`) is deployed directly to Vercel (`https://chhapai-web.vercel.app`), ensuring 24/7 availability, zero cold starts, and global CDN delivery at $0 cost.
-  3. Clean Lifecycle Management: When the desktop app is minimized to the system tray, the local API continues processing prints. When the app is quit, all child processes terminate cleanly.
-- **Rationale:** Delivers a 100% free, zero-maintenance operational model for the shopkeeper—no manual server startup, no terminal windows, and zero cold-start latency for walk-in customers.
+  1. **All-in-One Standalone Desktop Installer:** Packaging is orchestrated via `scripts/bundle-api.mjs` and `electron-builder`:
+     - Uses `pnpm --filter @chhapai/api --prod deploy` to stage a clean production bundle of the NestJS API into `apps/desktop/resources/api`.
+     - Detects and injects the native Windows Prisma query engine (`query_engine-windows.dll.node`) and `@prisma/client` runtime from the monorepo pnpm store into the staged bundle.
+     - Temporarily renames `node_modules` to `api_modules` during packaging so `electron-builder` exclusion rules do not discard production dependencies.
+     - Maps `extraResources: [{ "from": "resources/api", "to": "api" }]` into the final 179 MB `Chhapai Setup 1.0.0.exe` installer.
+  2. **Zero-Prerequisite Runtime Execution:** In `apps/desktop/src/main/serverManager.ts`, when running in a packaged environment (`app.isPackaged`):
+     - Restores `api_modules` or sets `NODE_PATH` pointing to the packaged dependencies.
+     - Spawns the embedded API at `process.resourcesPath/api/dist/main.js` using Electron's internal Node runtime (`process.execPath` with `ELECTRON_RUN_AS_NODE: "1"`).
+     - The shopkeeper's Windows 10/11 counter PC does **not** need Node.js, Git, or terminal access installed.
+  3. **Cloud-Managed Supabase Database (`ap-south-1`):** The embedded API connects directly to Supabase cloud PostgreSQL using standard IPv4 connection pooling, ensuring customer uploads and order states persist reliably in the cloud.
+  4. **Public Customer Portal on Vercel:** The mobile customer web app (`apps/web`) is deployed directly to Vercel (`https://chhapai-web.vercel.app`), delivering 24/7 global availability, edge speed, and zero cold starts at $0 cost.
+  5. **Clean Process Lifecycle:** When the desktop app is minimized, it retreats to the Windows system tray while keeping the embedded API and print queue running. When the user exits the application, all spawned child processes terminate cleanly.
+- **Rationale:** Delivers a 100% free, zero-maintenance, zero-config operational model for the shopkeeper—single installer, zero terminal windows, no monthly server bills, and instant responses for walk-in customers.
