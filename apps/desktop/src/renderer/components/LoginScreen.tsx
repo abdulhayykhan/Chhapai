@@ -41,6 +41,10 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
         setErrorMsg(
           "5 ghalat koshishon ki wajah se account 15 minute ke liye lock ho gaya hai.",
         );
+      } else if (err?.message === "Failed to fetch") {
+        setErrorMsg(
+          "Server se rabta nahi ho saka (Failed to fetch). Barah-e-karam chand second intizar karein ya Server URL check karein.",
+        );
       } else {
         setErrorMsg(
           err?.message || "Login na ho saka. Server connection check karein.",
@@ -130,7 +134,7 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
                   type="text"
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
-                  placeholder="http://localhost:3001"
+                  placeholder="http://localhost:3001/api/v1"
                   className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:border-primary"
                 />
               </div>

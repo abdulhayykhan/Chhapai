@@ -18,7 +18,7 @@ export const adminSocket = {
       socket.disconnect();
     }
 
-    const serverUrl = getServerUrl();
+    const serverUrl = getServerUrl().replace(/\/api\/v1\/?$/, "");
     socket = io(`${serverUrl}/admin`, {
       auth: { token },
       transports: ["websocket", "polling"],

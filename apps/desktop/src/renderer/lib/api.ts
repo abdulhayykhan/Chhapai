@@ -1,7 +1,7 @@
 import { storage } from "./storage";
 import { PrintJobDto, Shop, AdminUser, DailyReportDto } from "../types";
 
-let currentServerUrl = "http://localhost:3001";
+let currentServerUrl = "http://localhost:3001/api/v1";
 let currentAccessToken: string | null = null;
 
 export function getServerUrl(): string {
@@ -9,7 +9,15 @@ export function getServerUrl(): string {
 }
 
 export function setServerUrl(url: string): void {
-  currentServerUrl = url.replace(/\/+$/, "");
+  let clean = (url || "http://localhost:3001").trim().replace(/\/+$/, "");
+  // Normalize legacy ports/paths
+  if (clean.includes("localhost:4000")) {
+    clean = clean.replace("localhost:4000", "localhost:3001");
+  }
+  if (!clean.endsWith("/api/v1")) {
+    clean = `${clean}/api/v1`;
+  }
+  currentServerUrl = clean;
   storage.set("server_url", currentServerUrl);
 }
 
@@ -94,7 +102,7 @@ export const adminApi = {
   async init(): Promise<{ authenticated: boolean; user?: AdminUser }> {
     const savedUrl = await storage.get<string>("server_url");
     if (savedUrl) {
-      currentServerUrl = savedUrl;
+      setServerUrl(savedUrl);
     }
     const refreshed = await tryRefreshToken();
     if (refreshed) {

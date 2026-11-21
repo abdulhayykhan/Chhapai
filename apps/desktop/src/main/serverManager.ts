@@ -19,6 +19,7 @@ class ServerManager {
   private isRunning = false;
   private port = 3001;
   private tunnelUrl: string | null = null;
+  private errorMessage?: string;
 
   private checkPortAlive(port: number): Promise<boolean> {
     return new Promise((resolve) => {
@@ -31,6 +32,17 @@ class ServerManager {
         resolve(false);
       });
     });
+  }
+
+  private async waitForPortAlive(port: number, timeoutMs = 25000): Promise<boolean> {
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeoutMs) {
+      if (await this.checkPortAlive(port)) {
+        return true;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    return false;
   }
 
   public async start(): Promise<ServerStatus> {
@@ -67,6 +79,7 @@ class ServerManager {
 
     if (!fs.existsSync(apiPath)) {
       console.warn(`[ServerManager] API entry file not found at: ${apiPath}`);
+      this.errorMessage = `API entry file not found at: ${apiPath}`;
       return this.getStatus();
     }
 
@@ -80,6 +93,29 @@ class ServerManager {
       process.env.DATABASE_URL ||
       "postgresql://postgres.zsnkjfpoyvipvxmdkwsf:ChhapaiSecure2026!@aws-0-ap-south-1.pooler.supabase.com:5432/postgres";
 
+    // Ensure .env exists in apiDir so Prisma & ConfigModule always find DATABASE_URL
+    try {
+      const envPath = path.join(apiDir, ".env");
+      if (!fs.existsSync(envPath)) {
+        fs.writeFileSync(
+          envPath,
+          `DATABASE_URL="${dbUrl}"\nPORT=${this.port}\nJWT_SECRET="${process.env.JWT_SECRET || "chhapai_jwt_secure_2026"}"\nSTORAGE_PATH="${storageDir.replace(/\\/g, "/")}"\nNODE_ENV=production\n`,
+        );
+      }
+    } catch (envErr) {
+      console.warn("[ServerManager] Could not create local .env file:", envErr);
+    }
+
+    // Ensure log file is available for debugging child process
+    const logPath = path.join(app.getPath("userData"), "embedded-api.log");
+    let logStream: fs.WriteStream | null = null;
+    try {
+      logStream = fs.createWriteStream(logPath, { flags: "a" });
+      logStream.write(`\n--- [${new Date().toISOString()}] Starting embedded API server ---\n`);
+    } catch (logErr) {
+      console.warn("[ServerManager] Could not open log stream:", logErr);
+    }
+
     console.log(`[ServerManager] Starting embedded API from: ${apiPath}`);
 
     const apiModules = path.join(apiDir, "api_modules");
@@ -88,6 +124,7 @@ class ServerManager {
 
     try {
       this.apiProcess = fork(apiPath, [], {
+        cwd: apiDir,
         execPath: process.execPath,
         env: {
           ...process.env,
@@ -102,23 +139,44 @@ class ServerManager {
         silent: true,
       });
 
-      this.isEmbedded = true;
-      this.isRunning = true;
-
       this.apiProcess.stdout?.on("data", (data) => {
-        console.log(`[EmbeddedAPI stdout] ${data.toString().trim()}`);
+        const text = data.toString();
+        logStream?.write(`[stdout] ${text}`);
+        console.log(`[EmbeddedAPI stdout] ${text.trim()}`);
       });
 
       this.apiProcess.stderr?.on("data", (data) => {
-        console.error(`[EmbeddedAPI stderr] ${data.toString().trim()}`);
+        const text = data.toString();
+        logStream?.write(`[stderr] ${text}`);
+        console.error(`[EmbeddedAPI stderr] ${text.trim()}`);
+        this.errorMessage = text.slice(0, 300);
       });
 
       this.apiProcess.on("exit", (code, signal) => {
-        console.log(`[EmbeddedAPI] Process exited with code ${code}, signal ${signal}`);
+        const exitMsg = `Process exited with code ${code}, signal ${signal}`;
+        logStream?.write(`[exit] ${exitMsg}\n`);
+        console.log(`[EmbeddedAPI] ${exitMsg}`);
         this.isRunning = false;
         this.isEmbedded = false;
         this.apiProcess = null;
       });
+
+      // Wait up to 25 seconds for the embedded API to become ready
+      console.log(`[ServerManager] Waiting for embedded API to be alive on port ${this.port}...`);
+      const alive = await this.waitForPortAlive(this.port, 25000);
+      if (alive) {
+        console.log(`[ServerManager] Embedded API is alive on port ${this.port}!`);
+        this.isRunning = true;
+        this.isEmbedded = true;
+        this.errorMessage = undefined;
+      } else {
+        console.warn(`[ServerManager] Embedded API timed out waiting for port ${this.port}`);
+        this.isRunning = false;
+        this.isEmbedded = false;
+        if (!this.errorMessage) {
+          this.errorMessage = "API server response timeout (Port 3001 did not open in 25s)";
+        }
+      }
 
       // 4. Try starting Cloudflare Tunnel if configured or quick tunnel
       this.startTunnelIfAvailable();
@@ -126,9 +184,10 @@ class ServerManager {
       return this.getStatus();
     } catch (err: any) {
       console.error("[ServerManager] Failed to start embedded API:", err);
+      this.errorMessage = err?.message || "Failed to start API";
       return {
         ...this.getStatus(),
-        error: err?.message || "Failed to start API",
+        error: this.errorMessage,
       };
     }
   }
@@ -202,6 +261,7 @@ class ServerManager {
       isEmbedded: this.isEmbedded,
       port: this.port,
       tunnelUrl: this.tunnelUrl,
+      error: this.errorMessage,
     };
   }
 }
