@@ -1,218 +1,251 @@
 # Chhapai (چھپائی)
 
-Self-Service Walk-In Printing Platform for Retail Print Shops in Pakistan.
+**Self-Service Walk-In Printing Platform for Retail Print Shops in Pakistan.**  
 Architected and developed by [Abdul Hayy Khan](https://abdulhayykhan.dev).
 
-Production Web Application: https://chhapai-web.vercel.app
-GitHub Repository: https://github.com/abdulhayykhan/Chhapai
-Latest Windows Installer Release: https://github.com/abdulhayykhan/Chhapai/releases/tag/v1.0.0
-Author Portfolio: [abdulhayykhan.dev](https://abdulhayykhan.dev)
+---
+
+[![Live Web Application](https://img.shields.io/badge/Customer_Portal-chhapai--web.vercel.app-1D4ED8?style=for-the-badge&logo=vercel&logoColor=white)](https://chhapai-web.vercel.app)
+[![Windows Installer](https://img.shields.io/badge/Windows_Desktop_Installer-v1.0.0_Release-0284C7?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/abdulhayykhan/Chhapai/releases/tag/v1.0.0)
+[![Automated Verification](https://img.shields.io/badge/Automated_Tests-70%2F70_Passing-16A34A?style=for-the-badge)](https://github.com/abdulhayykhan/Chhapai/actions)
+[![License](https://img.shields.io/badge/License-MIT-0F172A?style=for-the-badge)](LICENSE)
+[![Author](https://img.shields.io/badge/Developer-Abdul_Hayy_Khan-4338CA?style=for-the-badge)](https://abdulhayykhan.dev)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-10.4-E0234E?style=flat-square&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![Electron](https://img.shields.io/badge/Electron-31.7-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-ap--south--1-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-010101?style=flat-square&logo=socket.io&logoColor=white)](https://socket.io/)
+[![pnpm](https://img.shields.io/badge/pnpm-Workspaces-F69220?style=flat-square&logo=pnpm&logoColor=white)](https://pnpm.io/)
+
+---
+
+### Quick Navigation
+
+- [1. Executive Summary](#1-executive-summary)
+- [2. Problem Statement in the Pakistani Context](#2-problem-statement-in-the-pakistani-context)
+- [3. System Architecture & Topology](#3-system-architecture--topology)
+- [4. Complete Technology Stack Matrix](#4-complete-technology-stack-matrix)
+- [5. Deep Component Breakdown](#5-deep-component-breakdown)
+  - [Shared Core Package (`packages/shared`)](#51-shared-core-package-packagesshared)
+  - [Customer Mobile Portal (`apps/web`)](#52-customer-mobile-portal-appsweb)
+  - [Administrative Backend Service (`apps/api`)](#53-administrative-backend-service-appsapi)
+  - [Counter Terminal Desktop Application (`apps/desktop`)](#54-counter-terminal-desktop-application-appsdesktop)
+  - [Hardware Silent Spooler Engine (`SumatraPDF`)](#55-hardware-silent-spooler-engine-sumatrapdf)
+- [6. Zero-Cost Free Operational Model](#6-zero-cost-free-operational-model)
+- [7. Monorepo Organization](#7-monorepo-organization)
+- [8. Automated Testing Pyramid (70/70)](#8-automated-testing-pyramid-7070)
+- [9. Setup & Development Guide](#9-setup--development-guide)
+- [10. Packaging & Windows Release Workflow](#10-packaging--windows-release-workflow)
+- [11. Architectural Decision Records (ADRs)](#11-architectural-decision-records-adrs)
+- [12. Security & Data Protection](#12-security--data-protection)
+- [13. Author & Credits](#13-author--credits)
+- [14. License](#14-license)
 
 ---
 
 ## 1. Executive Summary
 
-Chhapai is an open-source, walk-in printing platform engineered to modernize and streamline the retail print shop ecosystem in Pakistan. Traditional photocopying and computer printing shops across Pakistani urban centers and university campuses suffer from operational friction: customers crowd counter desks, hand over virus-infected USB thumb drives, or send sensitive personal documents over unencrypted consumer messaging channels like WhatsApp.
+Chhapai is an open-source, walk-in printing platform engineered to modernize and streamline the retail print shop ecosystem in Pakistan. Traditional photocopying and computer printing shops across Pakistani commercial markets and university campuses suffer from severe operational friction: customers crowd counter desks, hand over virus-infected USB drives, or send sensitive personal documents over unencrypted consumer messaging apps like WhatsApp.
 
-Chhapai replaces this manual chaos with a friction-free, zero-install customer experience and a deterministic, silent print engine for shopkeepers. Customers scan a physical QR code posted at the shop counter, upload their documents directly from their mobile browser, configure page selections and color options, inspect an exact quote calculated in Pakistani Rupees (PKR), and receive an automated short token (such as #042).
+Chhapai replaces this manual chaos with a friction-free, zero-install customer experience and a deterministic, silent print engine for shopkeepers:
 
-On the shopkeeper side, an Electron-based desktop application monitors the incoming queue via persistent real-time WebSockets. When a customer submits a job, the counter terminal sounds an audible chime, brings the preview to the front, and upon shopkeeper verification, silently dispatches the job directly to the designated physical printer using an embedded SumatraPDF binary without invoking Windows print dialogs.
+1. Customer Mobile Experience: Customers scan a counter QR code, upload documents directly from their mobile browser, configure page selections and color options, inspect an exact quote calculated in Pakistani Rupees (PKR), and receive an automated short token (such as `#042`).
+2. Shopkeeper Desktop Terminal: An Electron-based desktop application monitors the queue via persistent real-time WebSockets. When a customer submits a job, the counter terminal sounds an audible chime, brings the preview forward, and upon verification, silently dispatches the job directly to the designated physical printer using an embedded SumatraPDF binary without invoking Windows print dialogs.
+3. 100% Free Operational Model: Designed for zero monthly server overhead by combining Supabase cloud PostgreSQL, Vercel edge deployment for the customer interface, and an embedded zero-click background server manager inside the desktop app that eliminates cloud server fees and cold-start latencies.
 
-The system is configured to run on a 100% free-tier operational model combining Supabase cloud PostgreSQL, Vercel edge deployment for the customer mobile interface, and an embedded zero-click background server manager inside the desktop application that eliminates cloud server costs and cold-start latencies.
-
----
-
-## 2. Background and Problem Statement
-
-### 2.1 The Traditional Print Shop Workflow in Pakistan
-
-Retail print shops in Pakistan (commonly referred to as "Photostat and Printing" shops) handle hundreds of walk-in transactions daily from university students, legal professionals, corporate workers, and citizens needing government documentation. The standard operational flow suffers from severe structural vulnerabilities:
-
-1. USB Thumb Drive Contamination: Customers bring USB flash drives containing assignments, resumes, or national identity documents. Shop counter computers frequently suffer from malware infections, Trojan droppers, and file shortcut worms transmitted through infected customer drives.
-2. WhatsApp and Bluetooth Overhead: Customers are asked to add the shopkeeper's personal mobile phone number to WhatsApp to transmit PDF or DOCX files. This exposes the shopkeeper's personal contact details, clutters phone storage, creates customer privacy risks, and causes confusion over document versions.
-3. Lack of Pricing Transparency: Retail print pricing varies depending on single-sided versus double-sided paper use, black and white versus color toner, and page ranges. Misunderstandings between customers and counter staff regarding final page counts and price calculations frequently lead to counter disputes.
-4. Spooling Waterfalls and Bottlenecks: Counter operators must manually download files, launch Microsoft Word or Adobe Acrobat, press Ctrl+P, configure print settings (duplex, page numbers, color mode), select the appropriate physical printer, and confirm print dialogs. This manual overhead creates long physical queues during peak hours.
-
-### 2.2 The Chhapai Solution
-
-Chhapai eliminates these bottlenecks through four core engineering interventions:
-
-1. Zero-Install Mobile Customer Portal: Operates completely inside mobile web browsers (Safari, Chrome) via QR code scan. No account creation, app download, or phone number authentication is required for basic walk-in usage.
-2. Roman Urdu Vernacular Interface: Built specifically for local comprehension in Pakistan, using Roman Urdu terminology ("File Upload Karein", "Black & White", "Copies Ki Tadaad", "Raqam") formatted Left-to-Right (LTR) for natural interaction.
-3. Automated Document Ingestion and Conversion: Headless conversion running in a secure, macro-disabled sandbox converts DOCX, XLSX, PPTX, and image formats into standardized PDF files while strictly counting pages for pricing.
-4. Deterministic Silent Print Spooling: An embedded SumatraPDF worker automatically claims approved print jobs, sets hardware duplex and copy flags, routes monochrome jobs to black-and-white printers and multi-color jobs to designated color printers, and delivers silent output with zero human dialog interaction.
+> [!NOTE]
+> Chhapai is production-ready, featuring 70/70 passing automated tests across unit, integration, and Playwright mobile viewport end-to-end suites.
 
 ---
 
-## 3. System Architecture and Design Patterns
+## 2. Problem Statement in the Pakistani Context
 
-Chhapai is architected as an integrated TypeScript monorepo managed with pnpm workspaces. The architecture decouples the customer-facing interface, the administrative API, and the desktop hardware bridge while sharing strong Zod schemas, state machines, and business rules.
+### 2.1 The Traditional Retail Print Shop Workflow
 
-```
-Chhapai Monorepo Topology
-====================================================================
-packages/shared/         Shared schemas, enums, integer math & i18n
-apps/api/                NestJS 10 backend + Prisma ORM + Socket.IO
-apps/web/                Next.js 14 App Router customer mobile portal
-apps/desktop/            Electron 31 + React 18 counter app & worker
-docker/                  Containerization (Dockerfile.api, web, compose)
-docs/                    Architecture Decision Records & deployment specs
-.github/workflows/       Automated Windows installer CI/CD pipeline
-====================================================================
-```
-
-### 3.1 Architectural Flow Diagram
+Retail print shops in Pakistan (locally known as Photostat & Printing shops) handle hundreds of walk-in transactions daily from university students, legal professionals, corporate workers, and citizens needing government documentation. The standard operational workflow suffers from four major structural vulnerabilities:
 
 ```
-+-------------------------------------------------------------------------+
-| Customer Device (Mobile Browser)                                        |
-| 1. Scans Counter QR Code -> Opens https://chhapai-web.vercel.app/s/slug |
-| 2. Uploads Document (PDF, DOCX, JPG) -> Direct upload to API           |
-| 3. Configures Options (Copies, Color, Duplex, Page Range)              |
-| 4. Receives Live Integer Paisa PKR Quote                                |
-| 5. Submits Job -> Obtains Numeric Token (e.g., #042)                   |
-| 6. Polls /api/v1/public/jobs/:token for real-time status transitions    |
-+-------------------------------------------------------------------------+
-                                    |
-                                    v HTTPS / WSS
-+-------------------------------------------------------------------------+
-| Shopkeeper Desktop Terminal (Electron App)                              |
-| - Double-click Chhapai.Setup.1.0.0.exe to launch                       |
-| - Embedded Server Manager checks port 3001 and spawns API child process |
-| - Connects to Supabase Cloud PostgreSQL (aws-0-ap-south-1.pooler)      |
-| - Listens on Socket.IO namespace /admin for real-time incoming jobs     |
-| - Renders Document Preview, Editable Price Override & Keyboard Hotkeys  |
-| - Spools claimed jobs silently to physical printer via SumatraPDF binary|
-+-------------------------------------------------------------------------+
++-------------------------------------------------------------------------------+
+|                      TRADITIONAL VULNERABILITIES                              |
++-------------------------------------------------------------------------------+
+| [1] USB Drive Viruses      Infected customer flash drives contaminate counter |
+|                            terminals with Trojan droppers and shortcut worms. |
+| [2] WhatsApp Bottlenecks   Shopkeepers must share personal phone numbers,     |
+|                            cluttering phone storage and leaking contact info. |
+| [3] Price Misunderstandings Disputes over single vs double-sided page rates,  |
+|                            color toner pricing, and manual calculation errors.|
+| [4] Manual Print Dialogs   Operators manually open files in Word/Acrobat,    |
+|                            configure duplex and page numbers, slowing queues. |
++-------------------------------------------------------------------------------+
+```
+
+### 2.2 The Chhapai Intervention
+
+Chhapai eliminates these bottlenecks through four dedicated engineering interventions:
+
+- Zero-Install Mobile Portal: Operates completely inside mobile web browsers (Safari, Chrome) via QR code scan. No account creation, app download, or phone number authentication is required for basic walk-in usage.
+- Roman Urdu Vernacular Interface: Built specifically for local comprehension in Pakistan, using Roman Urdu terminology (`File Upload Karein`, `Black & White`, `Copies Ki Tadaad`, `Kul Raqam`) formatted Left-to-Right (LTR) for natural interaction.
+- Automated Document Ingestion and Conversion: Headless conversion running in a secure, macro-disabled sandbox converts DOCX, XLSX, PPTX, and image formats into standardized PDF files while strictly counting pages for pricing.
+- Deterministic Silent Print Spooling: An embedded SumatraPDF worker automatically claims approved print jobs, sets hardware duplex and copy flags, routes monochrome jobs to black-and-white printers and multi-color jobs to designated color printers, and delivers silent output with zero human dialog interaction.
+
+---
+
+## 3. System Architecture & Topology
+
+Chhapai is architected as an integrated TypeScript monorepo managed with pnpm workspaces. The architecture decouples the customer-facing interface, administrative API, and desktop hardware bridge while sharing strong Zod schemas, state machines, and business rules.
+
+```
++-----------------------------------------------------------------------------+
+|                     CUSTOMER MOBILE BROWSER INTERFACE                       |
+|                 Hosted on Vercel Edge: chhapai-web.vercel.app               |
+|                                                                             |
+|  - Scans Shop Counter QR Code                                               |
+|  - Uploads Document (PDF, DOCX, XLSX, PPTX, JPG, PNG)                       |
+|  - Configures Copies, Color Mode, Duplex (Single/Double), Page Range        |
+|  - Receives Live Integer Paisa PKR Quote Calculation                        |
+|  - Receives Numeric Token (e.g., #042)                                      |
+|  - Polls /api/v1/public/jobs/:token for real-time state changes             |
++-----------------------------------------------------------------------------+
+                                      |
+                           HTTPS REST | Real-time Polling
+                                      v
++-----------------------------------------------------------------------------+
+|                      MANAGED CLOUD DATABASE (SUPABASE)                      |
+|                  AWS Region: ap-south-1 (Mumbai, IPv4 Pooler)               |
+|                                                                             |
+|  - PostgreSQL 16 managed database with Prisma ORM migrations               |
+|  - Relational schema: Shops, Users, PrintJobs, Uploads, AuditLogs           |
+|  - Atomic conditional locking for job claim operations                      |
++-----------------------------------------------------------------------------+
+                                      ^
+                                      | Database Queries (Session Pooler)
+                                      v
++-----------------------------------------------------------------------------+
+|                  SHOPKEEPER WINDOWS DESKTOP TERMINAL                        |
+|                     Electron 31 + React 18 Counter App                      |
+|                                                                             |
+|  [Embedded Server Manager]                                                  |
+|   - Auto-checks port 3001; spawns background NestJS API child process       |
+|   - Connects to Supabase PostgreSQL database seamlessly                     |
+|                                                                             |
+|  [Counter Management Workspace]                                             |
+|   - Real-time incoming job queue via Socket.IO /admin namespace             |
+|   - Document preview viewer with live final price override input            |
+|   - Ergonomic keyboard accelerators (A: Approve, R: Reject, Up/Down)        |
+|   - Daily sales summary with one-click CSV report export                    |
+|                                                                             |
+|  [SumatraPDF Silent Print Worker]                                           |
+|   - Claims approved jobs with row-level atomic locking                      |
+|   - Automatic routing: B&W -> Monochrome Printer, Color -> Color Printer   |
+|   - Silent execution via standalone SumatraPDF binary (No Windows dialogs)  |
++-----------------------------------------------------------------------------+
 ```
 
 ---
 
-## 4. Technology Stack and Technical Rationale
+## 4. Complete Technology Stack Matrix
 
-| Layer | Technology | Version | Technical Justification |
+| Architectural Layer | Technology | Version | Rationale & Responsibility |
 | :--- | :--- | :--- | :--- |
-| Workspace Management | pnpm | 12.x / 9.x | Strict dependency isolation, shared symlinks, rapid CI/CD build caching across packages. |
-| Language & Typing | TypeScript | 5.7+ | End-to-end type safety spanning database entities, HTTP contracts, and WebSocket events. |
-| Schema Validation | Zod | 3.24+ | Single source of truth for runtime validation in shared package, API DTOs, and web forms. |
-| Customer Web App | Next.js (App Router) | 14.2+ | Server-side rendering, instant mobile viewport optimization, Tailwind CSS styling. |
-| Administrative API | NestJS | 10.4+ | Modular architecture, native dependency injection, decorators, Throttler rate limiting. |
-| Database & ORM | PostgreSQL + Prisma | 16 / 5.22+ | ACID compliance, row-level atomic locking, automated migrations and type-safe client. |
-| Real-Time Transport | Socket.IO | 4.8+ | WebSocket abstraction with automatic reconnection, heartbeat pings, and event rooms. |
-| Desktop Shell | Electron | 31.7+ | Cross-process isolation, native Windows taskbar flashing, system tray, audio chiming. |
-| Silent Print Engine | SumatraPDF (pdf-to-printer) | Bundled | Driver-independent, command-line silent spooling without Acrobat licensing costs. |
-| Testing Suites | Vitest + Playwright | 2.1 / 1.49 | Lightning-fast ESM unit testing and end-to-end mobile browser automation. |
+| Workspace Tooling | pnpm | 12.x / 9.x | Monorepo package linking, deterministic lockfiles, rapid parallel build caching. |
+| Typing & Contracts | TypeScript | 5.7+ | Shared static typing across backend endpoints, database entities, and client interfaces. |
+| Schema Validation | Zod | 3.24+ | Single source of truth for runtime validation in shared DTOs, API inputs, and web forms. |
+| Customer Web Portal | Next.js (App Router) | 14.2+ | Mobile-first server-side rendering, instant page transitions, Tailwind CSS utility styling. |
+| Administrative API | NestJS | 10.4+ | Structured dependency injection, modular controllers, Throttler rate limiting, WebSockets. |
+| Database & ORM | PostgreSQL + Prisma | 16 / 5.22+ | Relational integrity, atomic row-level claim queries, type-safe database access client. |
+| Real-Time Events | Socket.IO | 4.8+ | Low-latency duplex event transport for real-time counter queue synchronization. |
+| Desktop Container | Electron | 31.7+ | Desktop integration, process isolation, background API spawning, Windows notifications. |
+| Silent Spooling | SumatraPDF (pdf-to-printer) | 3.5+ | Portable, driver-agnostic silent printing bypassing Windows GUI print setup prompts. |
+| Unit Test Runner | Vitest | 2.1+ | High-speed ESM unit test execution with zero-configuration TypeScript support. |
+| Mobile E2E Runner | Playwright | 1.49+ | Mobile viewport Chromium automation verifying the end-to-end customer journey. |
 
 ---
 
-## 5. Detailed Component Catalog
+## 5. Deep Component Breakdown
 
-### 5.1 Shared Package (`packages/shared`)
+### 5.1 Shared Core Package (`packages/shared`)
 
-The shared library contains pure, environment-agnostic business logic compiled to ECMAScript modules and TypeScript declarations:
+The shared library contains pure, environment-agnostic business logic and typing rules consumed by both the web app, the backend API, and the desktop renderer:
 
-- Zod Validation Schemas: Contracts defining job submissions, shop configuration updates, upload metadata, and quote queries.
-- State Machine Transitions: Finite state machine governing legal job status progressions (`PENDING_APPROVAL` -> `APPROVED` -> `PRINTING` -> `COMPLETED`).
-- Integer Paisa Pricing Mathematics: Avoids floating-point precision errors by performing all financial computations in integer paisas (1 PKR = 100 paisas) before dividing for human-readable display.
-- Page Range Parsing Engine: Lexical parser that expands complex page ranges (such as `1-3, 5, 8-10`) into validated arrays of unique page indices while rejecting out-of-bounds inputs.
-- Roman Urdu Internationalization: Vernacular dictionary translating operational terms into localized Pakistani terminology.
+- Zod Validation Contracts: Strict validation schemas enforcing legal values for job submissions, file upload limits, shop rate updates, and quote queries.
+- Finite State Machine: State progression rules ensuring print jobs only transition through legal sequences: `PENDING_APPROVAL` -> `APPROVED` -> `PRINTING` -> `COMPLETED`, or terminal branches `REJECTED`, `FAILED`, and `CANCELLED`.
+- Integer Paisa Pricing Mathematics: Avoids floating-point precision inaccuracies by executing all currency math in integer paisas (1 PKR = 100 paisas) before dividing for display.
+- Lexical Page Range Parser: Expands and deduplicates complex human-entered page ranges (such as `1-3, 5, 8-10`) into validated arrays of page numbers while rejecting invalid ranges.
+- Roman Urdu Internationalization Dictionary: Vernacular dictionary mapping standard English phrases to conversational Roman Urdu.
 
-### 5.2 Customer Web Portal (`apps/web`)
+### 5.2 Customer Mobile Portal (`apps/web`)
 
-The customer mobile portal is optimized for 360px-420px mobile viewports:
+The customer web portal is tuned specifically for 360px-420px mobile screens:
 
-- Zero Account Overhead: Customers do not register or maintain profiles; transactions are anchored to short-lived anonymous public tokens.
-- Dynamic Upload Box: Supports direct file selection and drag-and-drop with client-side file size guardrails before streaming uploads.
-- Quick Stepper Controls: Dedicated buttons and quick presets (1, 2, 3, 5, 10) for copies selection.
-- Visual Swatches: High-contrast toggles for monochrome versus full-color printing and single versus double-sided paper duplexing.
-- Transparent Real-Time Quote: Instant calculation breakdown demonstrating page counts multiplied by copy quantities and base rates.
-- Sticky Action Bar: Floating frosted-glass container with live price summary and submission button.
-- Hero Token Display: Prominent high-contrast token banner with a one-click clipboard copy utility.
-- Live Status Tracker: Progressive visual timeline tracking submission, operator approval, active printing, and collection readiness.
-- Active Order Recovery: Stores the latest order metadata in browser localStorage so returning customers can instantly recover their active token status.
+- Zero Account Barrier: Customers do not need to register, remember passwords, or confirm emails; sessions are anchored to public tokens.
+- Interactive File Dropzone: Drag-and-drop and touch-to-browse file selector supporting PDF, DOCX, XLSX, PPTX, JPG, and PNG files up to 50 MB.
+- Quick Stepper Controls: Quantity stepper controls complemented by one-tap quick preset chips (`1`, `2`, `3`, `5`, `10`).
+- Visual Configuration Swatches: Visual toggle cards for Color Mode (Monochrome vs Vibrant Color) and Paper Sides (Single-sided vs Double-sided).
+- Transparent Calculation Box: Dynamic breakdown displaying computed pages, copy quantities, unit rates, and final total in PKR.
+- Floating Frosted-Glass Action Bar: Elevated bottom bar with backdrop blur ensuring price and submission controls are always reachable.
+- High-Contrast Token Badge: Clear `#042` numeric token presentation with a one-click clipboard copy utility and visual confirmation.
+- 4-Stage Progressive Timeline: Visual progress tracker displaying submission, shopkeeper approval, active printing, and collection readiness.
+- Active Order Persistence: Saves the latest active token in browser `localStorage` to allow returning customers to check order status with a single tap.
 
-### 5.3 Backend API Service (`apps/api`)
+### 5.3 Administrative Backend Service (`apps/api`)
 
-The backend API handles authentication, business validation, file storage, and hardware orchestration:
+The backend API handles authentication, business validation, file persistence, and worker management:
 
-- Modular NestJS Architecture: Separated into dedicated modules for Auth, Shops, Uploads, Jobs, Quotes, and Scheduled Tasks.
-- Database Entity Relationships: Models Shops, Users (Shopkeepers/Operators), PrintJobs, Uploads, PrintLogs, and AuditEvents.
-- Security and Rate Limiting: Built-in throttler prevents abuse by capping authentication attempts (5 per minute), file uploads (10 per hour per IP), and quote requests.
-- Account Lockout Protocol: Automatically locks administrative accounts for 15 minutes following 5 consecutive incorrect password submissions.
-- Scheduled Maintenance Cron: An hourly background task cleans up orphaned uploaded files older than configured retention limits (default 24 hours) and marks stale uncollected orders as expired.
-- Concurrency Safe Job Claiming: Uses atomic SQL conditional updates (`UPDATE "PrintJob" SET status = 'APPROVED' WHERE id = :id AND status = 'PENDING_APPROVAL'`) returning HTTP 409 Conflict if a multi-terminal counter tries to double-claim the same job.
+- Modular Architecture: Dedicated domain modules for `Auth`, `Shops`, `Uploads`, `Jobs`, `Quotes`, and `Cron`.
+- Security & Rate Limiting: Protected by `@nestjs/throttler` to prevent denial-of-service attempts (Login capped at 5/min, Uploads at 10/hr per IP, Quote queries at 20/hr).
+- 15-Minute Account Lockout: Automatically locks administrative accounts following 5 consecutive failed login attempts to stop brute-force attacks.
+- Concurrency-Safe Atomic Claiming: Uses conditional SQL updates (`UPDATE "PrintJob" SET status = 'APPROVED' WHERE id = :id AND status = 'PENDING_APPROVAL'`) returning HTTP 409 Conflict if two counter terminals attempt to claim the same job simultaneously.
+- Hourly Cleanup Cron: An automated background task runs every hour to remove stored document files older than configured retention limits (default: 24 hours) and marks stale uncollected orders as cancelled.
 
-### 5.4 Counter Desktop Application (`apps/desktop`)
+### 5.4 Counter Terminal Desktop Application (`apps/desktop`)
 
-The counter application gives shopkeepers complete command of the retail printing floor:
+The desktop application provides counter operators with a fast, high-volume workflow:
 
-- Zero-Click Embedded Server Manager: Automatically inspects port 3001 upon desktop startup. If inactive, it spawns the compiled NestJS API as a background Node child process, passing production Supabase database credentials.
-- Real-Time Queue Synchronization: Maintains an active WebSocket connection to the `/admin` namespace, refreshing incoming orders instantly.
-- Auditory Chimes and Taskbar Alerts: Generates Web Audio chimes upon job arrival, flashes the Windows taskbar, and triggers native Windows notifications when minimized.
-- Document Preview Panel: Embeds an interactive PDF preview viewer allowing the operator to verify formatting before consuming paper.
-- Price Override Capability: Allows the shopkeeper to modify the calculated price for custom customer requirements before final approval.
-- Ergonomic Keyboard Accelerators: Enables rapid counter operation through hotkeys:
-  - `A` or `Enter`: Approve selected job for printing.
-  - `R`: Open rejection dialog with quick-pick reasons.
-  - `Arrow Up` / `Arrow Down`: Navigate through queue items.
-- Daily Sales Analytics: Computes real-time metrics (Total Orders, Total Pages Printed, Gross Revenue in PKR, Monochrome vs Color Split) with one-click CSV report export.
-- Counter QR Code Generator: Generates, previews, and prints high-resolution SVG and PNG counter posters customized with the shop's name, phone, and direct URL.
-- Windows System Tray Integration: Minimizes cleanly to the Windows notification tray, continuing background monitoring without cluttering the taskbar.
+- Zero-Click Background Server Manager: On launch, the main process verifies port 3001. If inactive, it automatically forks `apps/api/dist/main.js` as an unprivileged child process with Supabase database connection variables.
+- Persistent Real-Time Queue: Subscribes to the `/admin` Socket.IO namespace for instant updates without manual page refreshes.
+- Audio & Visual Notification: Emits a custom Web Audio chime when a new job arrives, flashes the Windows taskbar, and triggers native Windows notifications when minimized.
+- Document Preview Panel: Embeds a PDF preview viewer allowing operators to check document layout and formatting before printing.
+- Live Price Override: Enables shopkeepers to adjust the final price on the fly for custom bindings, stapling, or discounts.
+- Ergonomic Keyboard Accelerators: Operators can approve jobs using `A` or `Enter`, reject jobs using `R`, and cycle through queue items using `Arrow Up` and `Arrow Down`.
+- Daily Sales Analytics: Calculates real-time daily metrics (Total Jobs, Pages Printed, Gross Revenue in PKR, Monochrome vs Color Split) with one-click CSV report export.
+- Counter QR Poster Generator: Generates and prints custom SVG and PNG posters for the shop counter, including the shop name, phone number, and direct URL.
+- Windows System Tray Integration: Minimizes cleanly to the Windows notification tray, maintaining queue monitoring in the background.
 
-### 5.5 Hardware Print Spooler (`pdf-to-printer` & SumatraPDF)
+### 5.5 Hardware Silent Spooler Engine (`SumatraPDF`)
 
-The silent print worker executes physical paper output deterministically:
+Physical output is handled by a deterministic background worker:
 
-- Standalone Native Binaries: Bypasses standard Windows GDI dialogs by executing pre-compiled SumatraPDF commands with command-line flags.
-- Hardware Feature Mapping: Translates job options into physical hardware instructions:
-  - Monochrome versus Color: Automatically routes monochrome documents to designated black-and-white printers and multi-color documents to color-capable devices.
-  - Duplex Options: Maps single-sided to `simplex` and double-sided to `duplexlong`.
-  - Page Ranges: Passes validated comma-separated page subsets directly to the print spooler.
-- Startup Backlog Recovery: If the desktop app was closed while approved jobs remained unprinted, the print worker scans the database on startup, claims any pending backlog, and spools them in sequential order.
+- Native Standalone Binaries: Integrates `pdf-to-printer`, bundling a self-contained SumatraPDF executable that sends jobs directly to the Windows print spooler without GUI dialogs.
+- Smart Hardware Routing: Automatically routes monochrome jobs to the configured black-and-white printer and multi-color jobs to the color printer.
+- Hardware Flag Translation: Correctly translates user options into physical print spooler arguments, including copy counts, simplex versus duplex (`duplexlong`), and page subsets.
+- Startup Backlog Sync: Automatically queries the database on startup, claims any approved jobs that remained unprinted while the app was closed, and spools them in sequence.
 - Error Interception: Catches operating system spooler failures (paper jams, spooler offline, out of toner), flags the job status as `FAILED`, and provides a one-click manual retry interface.
 
 ---
 
-## 6. Zero-Cost Cloud & Embedded Local Hybrid Topology
+## 6. Zero-Cost Free Operational Model
 
-To guarantee zero ongoing server bills for small shopkeepers in Pakistan, Chhapai implements a hybrid topology that decouples compute, storage, and database layers across free tiers:
+Chhapai is designed to run entirely on free cloud tiers and local PC compute, eliminating monthly recurring server bills:
 
-```
-+-------------------------------------------------------------------------+
-| Customer Web Portal                                                     |
-| Hosted on Vercel Free Edge Tier                                         |
-| Global CDN delivery, instant SSL, zero cold starts                     |
-+-------------------------------------------------------------------------+
-                                    |
-                                    v
-+-------------------------------------------------------------------------+
-| Managed Cloud Database                                                  |
-| Hosted on Supabase Free Tier (Region: ap-south-1 Mumbai)                 |
-| PostgreSQL 16 accessed via IPv4 Session Pooler (port 5432)              |
-| Stores shop configuration, daily sales, users, and print job metadata   |
-+-------------------------------------------------------------------------+
-                                    ^
-                                    |
-+-------------------------------------------------------------------------+
-| Counter PC (Shopkeeper Terminal)                                        |
-| Electron Desktop App wraps:                                            |
-| 1. Embedded NestJS API runtime running locally on port 3001             |
-| 2. Local disk file caching for active PDF print processing              |
-| 3. Local SumatraPDF binary communicating directly with USB / LAN printer|
-+-------------------------------------------------------------------------+
-```
+| Infrastructure Tier | Provider | Allocation | Operational Role |
+| :--- | :--- | :--- | :--- |
+| Customer Web Portal | Vercel Free Tier | Unlimited Edge Invocations | Serves mobile web app, renders upload forms, proxies public quote requests. |
+| Cloud Database | Supabase Free Tier | 500 MB Postgres (ap-south-1) | Stores relational schema, shop configurations, pricing models, and job metadata. |
+| API & Worker Compute | Local Shop PC | Host Windows Hardware | Runs embedded NestJS API, local file conversion, and silent SumatraPDF spooling. |
 
-### 6.1 Rationale for Avoiding Third-Party Free Containers
+### Rationale: Avoiding Free Cloud Container Hibernation
 
-Early evaluation considered hosting the API on free container platforms like Render or Hugging Face Spaces:
-- Render Free Tier: Automatically spins down web services after 15 minutes of inactivity, resulting in cold starts of 40-50 seconds and dropped WebSocket connections that disrupt walk-in retail operations.
-- Hugging Face Spaces: Transitioned Docker Spaces to paid tiers, returning HTTP 402 Payment Required for automated container deployments.
+Free container platforms (such as Render or Koyeb) hibernate after 15 minutes of inactivity. When a customer walks in to print, waking up a hibernating container introduces a cold start delay of 40 to 50 seconds and disconnects WebSockets, making them unsuitable for retail counters. 
 
-Chhapai solves this by utilizing the shopkeeper's physical Windows PC as the API execution engine through Electron's background process management. The shopkeeper simply double-clicks the application icon, and the API, database connection, and printer drivers initialize automatically.
+By running the API directly on the shopkeeper's PC through Electron's background server manager, Chhapai delivers instant responses, local hardware access, and zero ongoing server expenses.
 
 ---
 
-## 7. Monorepo Directory Organization
+## 7. Monorepo Organization
 
 ```
 Chhapai/
@@ -252,64 +285,58 @@ Chhapai/
 
 ---
 
-## 8. Comprehensive Automated Testing Pyramid
+## 8. Automated Testing Pyramid (70/70)
 
-Chhapai maintains strict test coverage across all layers of the monorepo. All 70 automated tests pass consistently:
+Chhapai maintains a comprehensive automated testing suite across every package in the monorepo:
 
 ```
-====================================================================
-Test Suite Breakdown                               Status      Count
-====================================================================
-packages/shared: Unit Tests (Vitest)                PASSED         28
-  - tests/schemas.test.ts (Input validation)        Passed          5
-  - tests/pricing.test.ts (Integer paisa math)      Passed          6
-  - tests/page-range.test.ts (Page list parsing)    Passed         11
-  - tests/state-machine.test.ts (State transitions) Passed          6
---------------------------------------------------------------------
-apps/api: Integration & Unit Tests (Vitest)          PASSED         27
-  - test/auth.spec.ts (Auth & lockout protocol)     Passed          3
-  - test/public.spec.ts (Shop public metadata)      Passed          5
-  - test/admin.spec.ts (Job approval & updates)     Passed          8
-  - test/conversion.spec.ts (File processing)       Passed          6
-  - test/cron.spec.ts (Hourly data retention purge) Passed          3
-  - test/token.spec.ts (Atomic claim conflict 409)  Passed          2
---------------------------------------------------------------------
-apps/desktop: Desktop UI & Worker Tests (Vitest)    PASSED         14
-  - tests/desktop-state.test.ts (State handling)    Passed          4
-  - tests/print-worker.test.ts (SumatraPDF worker)  Passed          6
-  - tests/components.test.tsx (Header, modals, UI)  Passed          4
---------------------------------------------------------------------
-apps/web: End-to-End Tests (Playwright)             PASSED          1
-  - e2e/customer-flow.spec.ts (Mobile workflow)     Passed          1
-====================================================================
-Total Automated Tests Passing:                                     70
-====================================================================
+================================================================================
+LAYER                   SPECIFICATION FILE                  STATUS   TESTS
+================================================================================
+packages/shared         tests/schemas.test.ts               PASSED       5 tests
+packages/shared         tests/pricing.test.ts               PASSED       6 tests
+packages/shared         tests/page-range.test.ts            PASSED      11 tests
+packages/shared         tests/state-machine.test.ts         PASSED       6 tests
+--------------------------------------------------------------------------------
+apps/api                test/auth.spec.ts                   PASSED       3 tests
+apps/api                test/public.spec.ts                 PASSED       5 tests
+apps/api                test/admin.spec.ts                  PASSED       8 tests
+apps/api                test/conversion.spec.ts             PASSED       6 tests
+apps/api                test/cron.spec.ts                   PASSED       3 tests
+apps/api                test/token.spec.ts                  PASSED       2 tests
+--------------------------------------------------------------------------------
+apps/desktop            tests/desktop-state.test.ts         PASSED       4 tests
+apps/desktop            tests/print-worker.test.ts          PASSED       6 tests
+apps/desktop            tests/components.test.tsx           PASSED       4 tests
+--------------------------------------------------------------------------------
+apps/web                e2e/customer-flow.spec.ts           PASSED       1 test
+================================================================================
+TOTAL AUTOMATED TESTS PASSING:                                          70 / 70
+================================================================================
 ```
 
-### Executing Test Suites
+### Running Test Commands
 
 ```bash
-# Run all unit and integration test suites across monorepo
+# Execute all unit and integration tests across monorepo
 pnpm test
 
-# Run customer mobile end-to-end test suite
+# Execute Playwright mobile viewport customer flow test
 pnpm --filter @chhapai/web test:e2e
 ```
 
 ---
 
-## 9. Local Development Setup Manual
+## 9. Setup & Development Guide
 
-### 9.1 System Prerequisites
-
-Before running the application locally, ensure your system has the following dependencies installed:
+### 9.1 Prerequisites
 
 - Node.js: Version 20.x or 24.x LTS.
 - pnpm: Version 9.x or higher (`npm install -g pnpm`).
 - Git: Version 2.40+ installed and configured.
 - Operating System: Windows 10/11 is required to test native SumatraPDF hardware spooling. (Linux and macOS can run API and Web components).
 
-### 9.2 Clone and Install Dependencies
+### 9.2 Clone & Install
 
 ```bash
 git clone https://github.com/abdulhayykhan/Chhapai.git
@@ -319,17 +346,12 @@ pnpm install
 
 ### 9.3 Environment Configuration
 
-Copy the example environment configuration files:
-
 ```bash
-# Root environment configuration
 cp .env.example .env
-
-# Backend API environment configuration
 cp apps/api/.env.example apps/api/.env
 ```
 
-Ensure `apps/api/.env` contains valid database credentials:
+Ensure `apps/api/.env` is configured with a valid PostgreSQL connection:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/chhapai_dev"
@@ -339,7 +361,7 @@ CORS_ORIGIN="http://localhost:3000,http://localhost:5173"
 FILE_UPLOAD_DIR="../../uploads"
 ```
 
-### 9.4 Database Initialization & Seeding
+### 9.4 Database Migrations & Seed Data
 
 ```bash
 cd apps/api
@@ -348,15 +370,12 @@ pnpm prisma db seed
 cd ../..
 ```
 
-Default seeded credentials for initial login:
-- URL: `http://localhost:3000/s/al-madina-photostat`
+Default seeded credentials:
+- Administrative URL: `http://localhost:3000/s/al-madina-photostat`
 - Administrative Email: `admin@chhapai.com`
 - Administrative Password: `Admin123!`
-- Default Shop Name: `Al-Madina Photostat & Printing`
 
-### 9.5 Running Development Servers
-
-Launch all services concurrently or in separate terminals:
+### 9.5 Starting Development Servers
 
 ```bash
 # Terminal 1: Backend API
@@ -371,56 +390,56 @@ pnpm --filter @chhapai/desktop dev
 
 ---
 
-## 10. Packaging & Releasing the Windows Desktop Application
+## 10. Packaging & Windows Release Workflow
 
-The desktop application is packaged using `electron-builder` into a self-contained NSIS installer (`.exe`) that bundles all required application code, unpacked native print binaries, and assets.
+The desktop application compiles into a standalone Windows installer (`.exe`) bundling the Electron runtime, pre-compiled application assets, and unpacked SumatraPDF binaries.
 
 ### 10.1 Local Compilation
 
 ```bash
-# Build all prerequisite packages
+# Build shared contracts and API
 pnpm --filter @chhapai/shared build
 pnpm --filter @chhapai/api build
 
-# Package desktop installer
+# Build and package desktop installer
 cd apps/desktop
 pnpm run build
 pnpm run package
 ```
 
-The compiled installer will be generated in `apps/desktop/release/Chhapai Setup 1.0.0.exe`.
+The compiled installer is output to: `apps/desktop/release/Chhapai Setup 1.0.0.exe`.
 
-### 10.2 Automated GitHub Actions Release Workflow
+### 10.2 Automated GitHub Actions Pipeline
 
-Chhapai includes an automated GitHub Actions release workflow configured in `.github/workflows/release.yml`. When a version tag (such as `v1.0.0`) is pushed to the repository, the runner:
+Whenever a semantic version tag (such as `v1.0.0`) is pushed to the repository, `.github/workflows/release.yml` triggers an automated build:
 
-1. Provisions a clean Windows runner (`windows-latest`).
-2. Checks out the repository, installs Node.js and pnpm.
-3. Installs dependencies and builds `@chhapai/shared` and `@chhapai/api`.
-4. Runs `electron-builder --win --publish never` to build `Chhapai Setup 1.0.0.exe`.
-5. Uploads the executable directly to GitHub Releases under the matching tag.
+1. Spins up a `windows-latest` runner.
+2. Checks out the repository, initializes Node.js and pnpm.
+3. Installs dependencies and compiles shared modules.
+4. Executes `electron-builder --win --publish never`.
+5. Uploads `Chhapai Setup 1.0.0.exe` to GitHub Releases.
 
 ---
 
-## 11. Architectural Decision Records (ADRs) Summary
+## 11. Architectural Decision Records (ADRs)
 
-| Decision ID | Title | Summary of Architectural Choice |
+| ADR Number | Subject | Architectural Decision |
 | :--- | :--- | :--- |
-| ADR 001 | Roman Urdu Vernacular | Standardized on Roman Urdu (`ur-roman.json`) formatted Left-to-Right for optimal local comprehension. |
-| ADR 002 | Monorepo Structure | Selected pnpm workspaces over separate repositories to share schemas, types, and build configs. |
-| ADR 003 | Integer Paisa Math | All currency calculations executed in integer paisas to prevent floating-point financial discrepancies. |
-| ADR 004 | Atomic Job Claiming | Implemented atomic database row conditional locking returning HTTP 409 to prevent duplicate prints. |
-| ADR 005 | Outbound Only Desktop | Desktop communicates exclusively via outbound WebSockets and HTTPS, eliminating router port-forwarding. |
-| ADR 006 | SumatraPDF Silent Engine | Integrated SumatraPDF through `pdf-to-printer` for silent, scriptable Windows printer spooling. |
-| ADR 007 | LibreOffice Headless | Isolated document conversion in a dedicated unprivileged sandbox with macros permanently disabled. |
-| ADR 008 | 70-Test QA Pyramid | Established complete test coverage across shared, api, desktop, and web components. |
-| ADR 009 | Zero-Click Embedded Model | Switched from paid cloud containers to an Electron-managed local API connected to Supabase cloud database. |
+| ADR 001 | Language Standardization | Selected Roman Urdu (`ur-roman.json`) formatted Left-to-Right for optimal local comprehension. |
+| ADR 002 | Monorepo Topology | Implemented pnpm workspaces to share Zod schemas, types, and build scripts across all packages. |
+| ADR 003 | Pricing Calculations | All financial calculations run in integer paisas (1 PKR = 100 paisas) to prevent floating-point rounding bugs. |
+| ADR 004 | Atomic Claim Protocol | Implemented conditional row-level database updates returning HTTP 409 Conflict to avoid double-printing. |
+| ADR 005 | Outbound-Only Networking | Desktop client communicates using outbound HTTPS and WebSockets, working through restrictive CGNAT networks. |
+| ADR 006 | SumatraPDF Engine | Integrated SumatraPDF via `pdf-to-printer` for silent, driver-independent Windows spooling. |
+| ADR 007 | Headless Conversion Sandbox | Isolated file conversions inside an unprivileged LibreOffice sandbox with macros permanently disabled. |
+| ADR 008 | 70-Test Quality Assurance | Maintained complete test coverage across shared schemas, API services, desktop components, and web flows. |
+| ADR 009 | Embedded Zero-Cost Model | Replaced paid cloud containers with an Electron-managed local server connected to Supabase cloud database. |
 
 ---
 
-## 12. Security Architecture & Data Protection
+## 12. Security & Data Protection
 
-Chhapai adheres to data protection principles tailored for retail walk-in operations:
+Chhapai implements security protections designed for retail walk-in environments:
 
 1. Macro-Disabled Sandbox Execution: Customer documents (`.docx`, `.xlsx`, `.pptx`) are converted using LibreOffice in headless mode with all VBA macros disabled, neutralizing document-borne macro malware.
 2. Automated File Retention Purging: Document files stored locally or on disk are automatically deleted by an hourly cleanup cron once jobs are marked completed or after 24 hours of inactivity.
@@ -429,11 +448,12 @@ Chhapai adheres to data protection principles tailored for retail walk-in operat
 
 ---
 
-## 13. Author and Credits
+## 13. Author & Credits
 
 Chhapai was conceived, architected, and built by [Abdul Hayy Khan](https://abdulhayykhan.dev).
 
 - Developer: [Abdul Hayy Khan](https://abdulhayykhan.dev)
+- Personal Portfolio: [abdulhayykhan.dev](https://abdulhayykhan.dev)
 - GitHub Profile: https://github.com/abdulhayykhan
 - Project Repository: https://github.com/abdulhayykhan/Chhapai
 
@@ -441,5 +461,5 @@ Chhapai was conceived, architected, and built by [Abdul Hayy Khan](https://abdul
 
 ## 14. License
 
-This software is released as an open-source project under the MIT License.
+This software is released as an open-source project under the MIT License.  
 Copyright 2026 [Abdul Hayy Khan](https://abdulhayykhan.dev). Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction.
