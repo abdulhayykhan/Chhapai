@@ -172,7 +172,15 @@ export const QrPosterModal: React.FC<Props> = ({ shop, onClose }) => {
                 {shopUrl}
               </p>
               <p className="text-[9px] text-slate-400 mt-2 font-medium">
-                Powered by Chhapai • Open Source by Abdul Hayy Khan (abdulhayykhan.dev)
+                Powered by Chhapai • Open Source by{" "}
+                <a
+                  href="https://abdulhayykhan.dev"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-slate-600"
+                >
+                  Abdul Hayy Khan
+                </a>
               </p>
             </div>
           </div>

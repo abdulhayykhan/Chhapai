@@ -1,12 +1,12 @@
 # Chhapai (چھپائی)
 
 Self-Service Walk-In Printing Platform for Retail Print Shops in Pakistan.
-Architected and developed by Abdul Hayy Khan (https://abdulhayykhan.dev).
+Architected and developed by [Abdul Hayy Khan](https://abdulhayykhan.dev).
 
 Production Web Application: https://chhapai-web.vercel.app
 GitHub Repository: https://github.com/abdulhayykhan/Chhapai
 Latest Windows Installer Release: https://github.com/abdulhayykhan/Chhapai/releases/tag/v1.0.0
-Author Portfolio: https://abdulhayykhan.dev
+Author Portfolio: [abdulhayykhan.dev](https://abdulhayykhan.dev)
 
 ---
 
@@ -431,9 +431,9 @@ Chhapai adheres to data protection principles tailored for retail walk-in operat
 
 ## 13. Author and Credits
 
-Chhapai was conceived, architected, and built by Abdul Hayy Khan.
+Chhapai was conceived, architected, and built by [Abdul Hayy Khan](https://abdulhayykhan.dev).
 
-- Personal Portfolio: https://abdulhayykhan.dev
+- Developer: [Abdul Hayy Khan](https://abdulhayykhan.dev)
 - GitHub Profile: https://github.com/abdulhayykhan
 - Project Repository: https://github.com/abdulhayykhan/Chhapai
 
@@ -442,4 +442,4 @@ Chhapai was conceived, architected, and built by Abdul Hayy Khan.
 ## 14. License
 
 This software is released as an open-source project under the MIT License.
-Copyright 2026 Abdul Hayy Khan. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction.
+Copyright 2026 [Abdul Hayy Khan](https://abdulhayykhan.dev). Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction.
