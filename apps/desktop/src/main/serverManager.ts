@@ -45,9 +45,24 @@ class ServerManager {
 
     // 2. Locate API build
     let apiPath = path.resolve(__dirname, "../../../api/dist/main.js");
+    let apiDir = path.resolve(__dirname, "../../../api");
+
     if (!fs.existsSync(apiPath)) {
       // In packaged app, check resources
-      apiPath = path.join(process.resourcesPath, "api", "dist", "main.js");
+      apiDir = path.join(process.resourcesPath, "api");
+      apiPath = path.join(apiDir, "dist", "main.js");
+
+      // Check if api_modules needs to be restored to node_modules
+      const apiModules = path.join(apiDir, "api_modules");
+      const nodeModules = path.join(apiDir, "node_modules");
+      if (fs.existsSync(apiModules) && !fs.existsSync(nodeModules)) {
+        try {
+          fs.renameSync(apiModules, nodeModules);
+          console.log("[ServerManager] Restored api_modules to node_modules");
+        } catch (err) {
+          console.warn("[ServerManager] Could not rename api_modules to node_modules:", err);
+        }
+      }
     }
 
     if (!fs.existsSync(apiPath)) {
@@ -67,8 +82,13 @@ class ServerManager {
 
     console.log(`[ServerManager] Starting embedded API from: ${apiPath}`);
 
+    const apiModules = path.join(apiDir, "api_modules");
+    const nodeModules = path.join(apiDir, "node_modules");
+    const nodePath = [nodeModules, apiModules].filter((d) => fs.existsSync(d)).join(path.delimiter);
+
     try {
       this.apiProcess = fork(apiPath, [], {
+        execPath: process.execPath,
         env: {
           ...process.env,
           PORT: String(this.port),
@@ -76,6 +96,8 @@ class ServerManager {
           JWT_SECRET: process.env.JWT_SECRET || "chhapai_jwt_secure_2026",
           STORAGE_PATH: storageDir,
           NODE_ENV: "production",
+          ELECTRON_RUN_AS_NODE: "1",
+          NODE_PATH: nodePath,
         },
         silent: true,
       });
