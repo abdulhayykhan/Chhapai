@@ -466,7 +466,11 @@ Chhapai was conceived, architected, and built by [Abdul Hayy Khan](https://abdul
 
 ---
 
-## 14. License
+## 14. License and Third-Party Notices
 
-This software is released as an open-source project under the MIT License.  
-Copyright 2026 [Abdul Hayy Khan](https://abdulhayykhan.dev). Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction.
+This project is licensed under the MIT License.  
+Copyright (c) 2026 [Abdul Hayy Khan](https://abdulhayykhan.dev).
+
+### Third-Party Software Notices
+
+- SumatraPDF: For silent Windows spooling, the desktop application interfaces with an unmodified standalone executable of SumatraPDF (provided through the open-source `pdf-to-printer` utility). SumatraPDF is free software licensed under the GNU General Public License v3 (GPLv3), incorporating rendering components from MuPDF under GNU AGPLv3. Chhapai is 100% free and open-source software and does not charge for or monetize SumatraPDF. Users may optionally supply a custom or updated SumatraPDF binary (such as recent 3.5+ or 3.7+ builds) by setting the `SUMATRAPDF_PATH` environment variable. Official project: https://www.sumatrapdfreader.org

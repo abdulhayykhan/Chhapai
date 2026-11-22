@@ -227,6 +227,9 @@ function setupIpcHandlers() {
       if (params.paperSize) {
         printOptions.paperSize = params.paperSize;
       }
+      if (process.env.SUMATRAPDF_PATH && fs.existsSync(process.env.SUMATRAPDF_PATH)) {
+        printOptions.sumatraPdfPath = process.env.SUMATRAPDF_PATH;
+      }
 
       console.log("[PrintWorker Main] Printing via pdf-to-printer:", {
         printer: printOptions.printer,
