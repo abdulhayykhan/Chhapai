@@ -92,6 +92,9 @@ class ServerManager {
     const dbUrl =
       process.env.DATABASE_URL ||
       "postgresql://postgres.zsnkjfpoyvipvxmdkwsf:ChhapaiSecure2026!@aws-0-ap-south-1.pooler.supabase.com:5432/postgres";
+    const publicWebUrl = (
+      process.env.PUBLIC_WEB_URL || "https://chhapai-web.vercel.app"
+    ).replace(/\/+$/, "");
 
     // Ensure .env exists in apiDir so Prisma & ConfigModule always find DATABASE_URL
     try {
@@ -99,7 +102,7 @@ class ServerManager {
       if (!fs.existsSync(envPath)) {
         fs.writeFileSync(
           envPath,
-          `DATABASE_URL="${dbUrl}"\nPORT=${this.port}\nJWT_SECRET="${process.env.JWT_SECRET || "chhapai_jwt_secure_2026"}"\nSTORAGE_PATH="${storageDir.replace(/\\/g, "/")}"\nNODE_ENV=production\n`,
+          `DATABASE_URL="${dbUrl}"\nPORT=${this.port}\nJWT_SECRET="${process.env.JWT_SECRET || "chhapai_jwt_secure_2026"}"\nSTORAGE_PATH="${storageDir.replace(/\\/g, "/")}"\nPUBLIC_WEB_URL="${publicWebUrl}"\nNODE_ENV=production\n`,
         );
       }
     } catch (envErr) {
@@ -132,6 +135,7 @@ class ServerManager {
           DATABASE_URL: dbUrl,
           JWT_SECRET: process.env.JWT_SECRET || "chhapai_jwt_secure_2026",
           STORAGE_PATH: storageDir,
+          PUBLIC_WEB_URL: publicWebUrl,
           NODE_ENV: "production",
           ELECTRON_RUN_AS_NODE: "1",
           NODE_PATH: nodePath,

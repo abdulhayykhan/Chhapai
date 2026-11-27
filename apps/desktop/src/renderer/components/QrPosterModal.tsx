@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Shop } from "../types";
-import { adminApi, getServerUrl } from "../lib/api";
+import { adminApi } from "../lib/api";
 import {
   X,
   Download,
@@ -58,7 +58,10 @@ export const QrPosterModal: React.FC<Props> = ({ shop, onClose }) => {
     window.print();
   };
 
-  const shopUrl = `${getServerUrl().replace(":3001", ":3000")}/s/${shop?.slug || "default"}`;
+  const publicWebUrl = (
+    import.meta.env.VITE_PUBLIC_WEB_URL || "https://chhapai-web.vercel.app"
+  ).replace(/\/+$/, "");
+  const shopUrl = `${publicWebUrl}/s/${shop?.slug || "main-branch"}`;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">

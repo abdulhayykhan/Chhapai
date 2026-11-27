@@ -542,8 +542,10 @@ export class AdminService {
 
   async generateQr(shopId: string, format: "png" | "svg" = "png") {
     const shop = await this.getSettings(shopId);
-    const webUrl =
-      this.config.get<string>("PUBLIC_WEB_URL") || "http://localhost:3000";
+    const webUrl = (
+      this.config.get<string>("PUBLIC_WEB_URL") ||
+      "https://chhapai-web.vercel.app"
+    ).replace(/\/+$/, "");
     const targetUrl = `${webUrl}/s/${shop.slug}`;
 
     if (format === "svg") {
